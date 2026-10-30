@@ -11,6 +11,7 @@ Statuses: TODO, DOING, DONE, BLOCKED. Last updated 2026-10-30.
 | 4 | `cpufish` core crate (S1): Provider, Registry, portable provider, conformance suite | DONE (PR #4) | RUSTSEC-2024-0436 (`paste` via `gemm`) acknowledged in deny.toml per PM ruling 2026-10-30 |
 | 5 | `cpufish-aocl` (S2): design in `docs/S2-AOCL-DESIGN.md`, then code | DONE (design PR #5; code PR with 0.0.5) | link-time provider over `aocl-blas`; AOCL tests pass LOCALLY only (`docs/MEASUREMENTS.md`); **UNVERIFIED in CI** until a self-hosted runner is registered for this repo. Tests: `aocl_passes_conformance`, `aocl_probe_succeeds`, `aocl_reports_version_threads_and_isa` |
 | 6 | `cpufish-onemkl` (S3): link-time provider over `onemkl` 0.2 | DONE (0.0.6) | tests pass LOCALLY only (`docs/MEASUREMENTS.md`), **UNVERIFIED in CI** (no self-hosted runner): `onemkl_passes_conformance`, `onemkl_probe_succeeds`, `onemkl_reports_version_threads_and_isa` |
-| 7 | Bench harness (S4), OpenBLAS (S5), loader `cpufish-sys` (option B) | TODO | S4 next: Fuel shapes (f32, NoTrans/NoTrans, alpha=1, beta=0, one gemm per batch slice) |
+| 7 | Bench harness (S4) | DONE (0.0.7) | `crates/cpufish-bench`; timings are NOT a ranking (shared, loaded box); numbers withheld from docs (PM ruling); shapes are a superset, Fuel has no fixed list |
+| 8 | OpenBLAS (S5), loader `cpufish-sys` (option B), re-measure S4 on a quiet box / the self-hosted runner | TODO | oneMKL measured on an AMD CPU is a valid test of the provider; conclude nothing about Intel hardware (PM 2026-10-30). Make threads an explicit harness setting (Fuel runs library defaults) |
 
 Out of scope: Unpopped's `unpopped-cpu-c` emitter (Unpopped's unless CireSnave rules); `onemkl`/`onemkl-sys` (Bonefish lane; consume from crates.io).

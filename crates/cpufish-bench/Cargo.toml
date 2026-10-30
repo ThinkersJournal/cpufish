@@ -1,0 +1,20 @@
+[package]
+name = "cpufish-bench"
+version = "0.0.7"
+edition = "2024"
+rust-version = "1.95"
+description = "Benchmark harness comparing CPUFish providers on Fuel-style gemm shapes"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/ThinkersJournal/cpufish"
+publish = false
+
+[features]
+# Vendor providers are link-time, so each needs its library at build and run time. Off by default.
+aocl = ["dep:cpufish-aocl"]
+onemkl = ["dep:cpufish-onemkl"]
+onemkl-openmp = ["onemkl", "cpufish-onemkl/threading-intel-openmp"]
+
+[dependencies]
+cpufish = { path = "../..", version = "0.0.7" }
+cpufish-aocl = { path = "../cpufish-aocl", version = "0.0.7", optional = true }
+cpufish-onemkl = { path = "../cpufish-onemkl", version = "0.0.7", optional = true, default-features = false, features = ["threading-sequential"] }

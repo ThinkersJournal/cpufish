@@ -41,3 +41,25 @@ test result: ok. 3 passed; 0 failed        (default: threading-sequential)
 With `--no-default-features --features threading-intel-openmp`: 3 passed, `threads: Some(16)`.
 `isa` is oneMKL's processor-family string from `MKL_Get_Version`; it does NOT name the vector-ISA tier in force (no query for that
 in `onemkl` 0.2), so consumers should not read it as one.
+
+## S4 bench harness, 2026-10-30, local Windows box (not CI)
+
+Run: `cargo run --release -p cpufish-bench --features aocl,onemkl` at the S4 PR head (median of 5 runs after 1 warm-up).
+Same environment as S2/S3 above. oneMKL used the default **sequential** layer, AOCL reported 32 threads, portable is single-threaded.
+
+## Providers
+
+- `portable` version=None config=Config { threads: Some(1), isa: Some("runtime-detected by the gemm crate") }
+- `aocl` version=Some("AOCL-BLAS 5.3.0 Build 20260511") config=Config { threads: Some(32), isa: Some("zen4") }
+- `onemkl` version=Some("Intel(R) oneAPI Math Kernel Library Version 2026.1-Product Build 20260612 for Intel(R) 64 architecture applications") config=Config { threads: Some(1), isa: Some("Intel(R) Architecture processors") }
+
+f32, NoTrans/NoTrans, alpha=1, beta=0, median of 5 runs after 1 warm-up. GFLOP/s = 2mnk / time.
+
+(Timing table withheld from this document: PM ruling 2026-10-30 says no number goes in a doc before the Fuel lane confirms the real shapes. Fuel replied it has no fixed list, so the shapes stay a provisional superset. The harness prints the table.)
+
+**Timings from this harness are NOT a ranking of providers: the box is shared and loaded, and thread use is unconfirmed.** The box is shared with about 20 other agent lanes running builds, so the CPU was not
+idle (not measured; the load was not sampled). All three providers land near 60 GFLOP/s on large squares, which is
+more likely contention or an unused thread pool than parity: AOCL's reported 32 threads did not show up as speedup, and no
+check was made that BLIS actually ran multi-threaded. Treat this as proof the harness runs and the providers agree on
+the answer (max abs error vs portable <= 1.8e-4 on values in [-1, 1]), not as a ranking. Re-measure on a quiet box or the
+self-hosted runner before any provider choice.

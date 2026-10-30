@@ -1,0 +1,19 @@
+[package]
+name = "cpufish-onemkl"
+version = "0.0.6"
+edition = "2024"
+rust-version = "1.95"
+description = "Intel oneAPI MKL provider for CPUFish"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/ThinkersJournal/cpufish"
+publish = false
+
+[features]
+default = ["threading-sequential"]
+# Exactly one threading layer, forwarded to `onemkl`. Sequential is reproducible; openmp needs libiomp5md at run time.
+threading-sequential = ["onemkl/threading-sequential"]
+threading-intel-openmp = ["onemkl/threading-intel-openmp"]
+
+[dependencies]
+cpufish = { path = "../..", version = "0.0.6" }
+onemkl = { version = "0.2", default-features = false, features = ["lp64", "link-dynamic", "blas"] }

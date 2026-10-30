@@ -1,6 +1,6 @@
 [package]
 name = "cpufish"
-version = "0.0.6"
+version = "0.0.7"
 edition = "2024"
 rust-version = "1.95"
 description = "Vendor-neutral CPU math layer for Fuel with per-vendor providers selected at run time"
@@ -15,6 +15,6 @@ thiserror = "2"
 # `cpufish-aocl` and `cpufish-onemkl` need a vendor install at build and run time, so it is a member but not a default member:
 # plain `cargo build/test/clippy` at the root (hosted CI) never touches it. Build one with `-p <crate>`.
 [workspace]
-members = [".", "crates/cpufish-aocl", "crates/cpufish-onemkl"]
+members = [".", "crates/cpufish-aocl", "crates/cpufish-onemkl", "crates/cpufish-bench"]
 default-members = ["."]
 resolver = "3"

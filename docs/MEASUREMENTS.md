@@ -41,3 +41,34 @@ test result: ok. 3 passed; 0 failed        (default: threading-sequential)
 With `--no-default-features --features threading-intel-openmp`: 3 passed, `threads: Some(16)`.
 `isa` is oneMKL's processor-family string from `MKL_Get_Version`; it does NOT name the vector-ISA tier in force (no query for that
 in `onemkl` 0.2), so consumers should not read it as one.
+
+## S4 bench harness, 2026-10-30, local Windows box (not CI)
+
+Run: `cargo run --release -p cpufish-bench --features aocl,onemkl` at the S4 PR head (median of 5 runs after 1 warm-up).
+Same environment as S2/S3 above. oneMKL used the default **sequential** layer, AOCL reported 32 threads, portable is single-threaded.
+
+## Providers
+
+- `portable` version=None config=Config { threads: Some(1), isa: Some("runtime-detected by the gemm crate") }
+- `aocl` version=Some("AOCL-BLAS 5.3.0 Build 20260511") config=Config { threads: Some(32), isa: Some("zen4") }
+- `onemkl` version=Some("Intel(R) oneAPI Math Kernel Library Version 2026.1-Product Build 20260612 for Intel(R) 64 architecture applications") config=Config { threads: Some(1), isa: Some("Intel(R) Architecture processors") }
+
+f32, NoTrans/NoTrans, alpha=1, beta=0, median of 5 runs after 1 warm-up. GFLOP/s = 2mnk / time.
+
+| shape (m x n x k) | portable GFLOP/s | portable max err vs portable | aocl GFLOP/s | aocl max err vs portable | onemkl GFLOP/s | onemkl max err vs portable |
+|---|---|---|---|---|---|---|
+| square 128 | 68.6 | 0.00e0 | 63.3 | 0.00e0 | 63.4 | 0.00e0 |
+| square 512 | 69.3 | 0.00e0 | 55.4 | 3.62e-5 | 63.4 | 3.62e-5 |
+| square 1024 | 58.5 | 0.00e0 | 59.0 | 4.20e-5 | 59.4 | 4.20e-5 |
+| decode 1x4096x4096 | 8.4 | 0.00e0 | 11.3 | 1.83e-4 | 10.8 | 1.83e-4 |
+| prefill 32x4096x4096 | 23.5 | 0.00e0 | 32.0 | 5.34e-5 | 30.9 | 5.34e-5 |
+| prefill 256x4096x4096 | 58.6 | 0.00e0 | 44.5 | 6.63e-5 | 46.4 | 6.63e-5 |
+| ffn 256x11008x4096 | 52.2 | 0.00e0 | 47.3 | 6.10e-5 | 46.4 | 6.10e-5 |
+| attn-slice 256x256x128 | 50.2 | 0.00e0 | 54.5 | 0.00e0 | 54.9 | 0.00e0 |
+
+**Read this before using the numbers.** The box is shared with about 20 other agent lanes running builds, so the CPU was not
+idle (not measured; the load was not sampled). All three providers land near 60 GFLOP/s on large squares, which is
+more likely contention or an unused thread pool than parity: AOCL's reported 32 threads did not show up as speedup, and no
+check was made that BLIS actually ran multi-threaded. Treat this as proof the harness runs and the providers agree on
+the answer (max abs error vs portable <= 1.8e-4 on values in [-1, 1]), not as a ranking. Re-measure on a quiet box or the
+self-hosted runner before any provider choice.

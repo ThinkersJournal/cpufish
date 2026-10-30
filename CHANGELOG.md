@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.0.5
+
+- Cargo workspace; new `crates/cpufish-aocl` (S2): `Aocl` provider over `aocl-blas` 0.1 gemm f32/f64, not a default member (needs AOCL). `publish = false`.
+- Core crate unchanged.
+
 ## 0.0.4
 
 - Add `docs/S2-AOCL-DESIGN.md`, the `cpufish-aocl` design (docs only).

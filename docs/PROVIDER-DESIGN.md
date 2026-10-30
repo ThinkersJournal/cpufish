@@ -25,6 +25,7 @@ pub trait Provider: Send + Sync {
     fn version(&self) -> Option<String>;          // library version if the library reports it
     fn probe(&self) -> Result<(), ProbeError>;    // loads the library, runs a 2x2 known-answer gemm
     fn capabilities(&self) -> &[Capability];      // what it claims, per (op, dtype)
+    fn effective_config(&self) -> Config;        // threads + ISA actually in force
     fn gemm_f32(&self, a: &GemmArgs<f32>) -> Result<(), Error>;   // typed entry points, default = Unsupported
     fn gemm_f64(&self, a: &GemmArgs<f64>) -> Result<(), Error>;
 }
@@ -46,7 +47,7 @@ Decisions and their reasons:
 5. **Vendor crates are optional dependencies** of per-provider crates (`cpufish-aocl` etc.), each gated by a cargo feature
    on the umbrella `cpufish`. Dependencies are crates.io versions only.
 6. **Threading and ISA knobs** (oneMKL `pin_isa`/`ThreadCountGuard`, BLIS `BLIS_NUM_THREADS`) are provider-specific
-   config passed at `install` time, surfaced in `capabilities().notes`; no global state changes from `probe`.
+   config passed at `install` time, surfaced in `capabilities().notes`; no global state changes from `probe`. Added after Fuel review: `fn effective_config(&self) -> Config` reports the thread count and ISA actually in force.
 7. **Determinism metadata** (Fuel's `PrecisionGuarantee`: bit-stable on fixed hardware, ulp bounds) is exposed per
    capability later; first cut reports only "claimed", measured by the shared test suite.
 
@@ -60,8 +61,9 @@ Decisions and their reasons:
 | S4 | benchmark harness: same gemm shapes across all available providers, one table | local + runner |
 | S5 | OpenBLAS provider; then LAPACK/FFT/vector-math ops | per provider |
 
-## Open questions for the Fuel lane
+## Answers from the Fuel lane (2026-10-30, `origin/main@3534c2a6`, message from the Fuel lane)
 
-1. Does Fuel's Judge want one registration per (provider, op, dtype) from `capabilities()` directly, or its own adapter?
-2. Is a batched gemm (one call, many slices) needed in the first cut? Fuel loops per slice today; MKL/BLIS have batch APIs.
-3. Where should conv2d-via-gemm live (Fuel `fuel-conv` today)?
+1. **Fuel uses its own adapter, not 1:1 registration.** A Fuel registration is an FKC contract with accuracy/determinism claims that Fuel verifies in its own ledger before preferring a kernel. `capabilities()` stays printable data (useful to generate contracts and tests); Fuel adds the claims.
+2. **Batched gemm is not in the first cut.** Add `Op::GemmBatched` later, driven by a measured shape table from the S4 harness.
+3. **conv2d-via-gemm stays in Fuel** (`fuel-conv`); a vendor-native conv would be a separate `Op::Conv`.
+4. **Request, adopted in decision 6:** providers report the *effective* thread count and ISA (`effective_config()` on `Provider`, also summarised in `capabilities().notes`), because ULP/bit-stability depends on them.

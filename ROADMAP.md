@@ -8,6 +8,7 @@ Statuses: TODO, DOING, DONE, BLOCKED. Last updated 2026-10-30.
 | 1 | Survey and design note: Fuel's CPU path, AOCL, oneMKL CPU, OpenBLAS/BLIS/Accelerate/ARM PL, SIMD kernels; Windows+Linux, x86-64+aarch64; licences. Options, recommendation, no code | DONE (PR #2) | docs only |
 | 2 | Design the vendor-neutral CPU layer with the Fuel lane (run-time provider selection) | DONE (PR #3; Fuel lane reviewed 2026-10-30) | after row 1; no edits to Fuel's repo |
 | 3 | Take over `ciresnave/aocl`: adopt its ROADMAP, keep Fuel's `aocl-blas`/`aocl-types` 0.1 dependency working | TODO | SemVer; coordinate with the Fuel lane before any breaking release |
-| 4 | `cpufish-sys` / `cpufish` implementation | BLOCKED | on rows 1-2 |
+| 4 | `cpufish` core crate (S1): Provider, Registry, portable provider, conformance suite | DOING (PR) | `cargo deny` advisory RUSTSEC-2024-0436 (`paste`, via `gemm` 0.19.0, its latest) awaits PM disposition |
+| 5 | `cpufish-aocl` (S2), `cpufish-onemkl` (S3), bench harness (S4) | TODO | after S1 |
 
 Out of scope: Unpopped's `unpopped-cpu-c` emitter (Unpopped's unless CireSnave rules); `onemkl`/`onemkl-sys` (Bonefish lane; consume from crates.io).

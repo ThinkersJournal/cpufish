@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.3
+
+- Core crate (S1): `Provider` trait, `Registry`, pure-Rust `portable` provider (gemm f32/f64), shared `conformance` suite. Still `publish = false`.
+
 ## 0.0.2
 
 - Add `docs/PROVIDER-DESIGN.md`, the provider trait sketch (ROADMAP row 2). Docs only.

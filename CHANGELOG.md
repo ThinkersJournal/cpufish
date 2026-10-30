@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.4
+
+- Add `docs/S2-AOCL-DESIGN.md`, the `cpufish-aocl` design (docs only).
+
 ## 0.0.3
 
 - Core crate (S1): `Provider` trait, `Registry`, pure-Rust `portable` provider (gemm f32/f64), shared `conformance` suite. Still `publish = false`.

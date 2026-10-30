@@ -1,6 +1,6 @@
 [package]
 name = "cpufish"
-version = "0.0.4"
+version = "0.0.5"
 edition = "2024"
 rust-version = "1.95"
 description = "Vendor-neutral CPU math layer for Fuel with per-vendor providers selected at run time"
@@ -11,3 +11,10 @@ publish = false
 [dependencies]
 gemm = "0.19"
 thiserror = "2"
+
+# `cpufish-aocl` needs an AOCL install at build and run time, so it is a member but not a default member:
+# plain `cargo build/test/clippy` at the root (hosted CI) never touches it. Build it with `-p cpufish-aocl`.
+[workspace]
+members = [".", "crates/cpufish-aocl"]
+default-members = ["."]
+resolver = "3"

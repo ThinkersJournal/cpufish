@@ -4,6 +4,12 @@ all-features = true
 
 [advisories]
 version = 2
+ignore = [
+    # `paste` crate unmaintained - transitive dependency via gemm 0.19.0 (the latest gemm; the same crate Fuel's CPU backend uses)
+    # Impact: None; this is an unmaintained notice, not a vulnerability, and `paste` is a compile-time macro crate with no runtime attack surface
+    # Tracking: Revisit when gemm drops `paste` or a maintained fork is adopted (PM ruling 2026-10-30)
+    "RUSTSEC-2024-0436",
+]
 
 [licenses]
 version = 2

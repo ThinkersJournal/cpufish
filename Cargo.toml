@@ -1,8 +1,13 @@
 [package]
 name = "cpufish"
-version = "0.0.2"
-edition = "2021"
-description = "Vendor-neutral CPU math layer for Fuel with per-vendor providers (placeholder)"
+version = "0.0.3"
+edition = "2024"
+rust-version = "1.95"
+description = "Vendor-neutral CPU math layer for Fuel with per-vendor providers selected at run time"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/ThinkersJournal/cpufish"
 publish = false
+
+[dependencies]
+gemm = "0.19"
+thiserror = "2"

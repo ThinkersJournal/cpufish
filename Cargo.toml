@@ -1,0 +1,8 @@
+[package]
+name = "cpufish"
+version = "0.0.0"
+edition = "2021"
+description = "Vendor-neutral CPU math layer for Fuel with per-vendor providers (placeholder)"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/ThinkersJournal/cpufish"
+publish = false

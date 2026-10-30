@@ -106,7 +106,10 @@ fn main() {
         );
     }
     println!(
-        "\nf32, NoTrans/NoTrans, alpha=1, beta=0, median of {reps} runs after 1 warm-up. GFLOP/s = 2mnk / time.\n"
+        "\nf32, NoTrans/NoTrans, alpha=1, beta=0, median of {reps} runs after 1 warm-up. GFLOP/s = 2mnk / time."
+    );
+    println!(
+        "\n**Timings from this harness are NOT a ranking of providers: the box is shared and loaded, and thread use is unconfirmed.**\n"
     );
     print!("| shape (m x n x k) |");
     for p in &providers {

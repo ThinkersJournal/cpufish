@@ -1,6 +1,6 @@
 [package]
 name = "cpufish-openblas"
-version = "0.0.16"
+version = "0.0.17"
 edition = "2024"
 rust-version = "1.95"
 description = "OpenBLAS provider for CPUFish, loaded at run time"
@@ -9,5 +9,5 @@ repository = "https://github.com/ThinkersJournal/cpufish"
 publish = false
 
 [dependencies]
-cpufish = { path = "../..", version = "0.0.16" }
-cpufish-sys = { path = "../cpufish-sys", version = "0.0.16" }
+cpufish = { path = "../..", version = "0.0.17" }
+cpufish-sys = { path = "../cpufish-sys", version = "0.0.17" }

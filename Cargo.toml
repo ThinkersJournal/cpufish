@@ -1,6 +1,6 @@
 [package]
 name = "cpufish"
-version = "0.0.17"
+version = "0.0.18"
 edition = "2024"
 rust-version = "1.95"
 description = "Vendor-neutral CPU math layer for Fuel with per-vendor providers selected at run time"

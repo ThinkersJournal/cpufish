@@ -47,6 +47,8 @@ fn registry() -> Registry {
     r.install(Arc::new(cpufish_aocl::Aocl::new()));
     #[cfg(feature = "onemkl")]
     r.install(Arc::new(cpufish_onemkl::OneMkl::new()));
+    #[cfg(feature = "openblas")]
+    r.install(Arc::new(cpufish_openblas::OpenBlas::new()));
     r
 }
 

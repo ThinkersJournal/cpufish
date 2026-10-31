@@ -1,5 +1,7 @@
-# Runs the cpufish-aocl provider tests on a self-hosted Windows runner that has AMD AOCL installed (hosted runners have
-# no AOCL, so hosted CI cannot run them; ROADMAP row 3, CLAUDE.md "tests that cannot run on GitHub").
+# Runs the cpufish-aocl provider tests, then the S4 gemm benchmark (ROADMAP row 8), on a self-hosted Windows runner that
+# has AMD AOCL installed (hosted runners have no AOCL, so hosted CI cannot run them; ROADMAP row 3, CLAUDE.md "tests that
+# cannot run on GitHub"). The runner is ephemeral (one job per registration), so everything runs in this ONE job, and a
+# failed step does not stop the later independent ones.
 #
 # Triggers: dispatch only. No pull_request (a PR would run our code on the maintainer's machine), no secrets, no
 # third-party actions. The runner is ephemeral: one job per registration, so every run is a deliberate act.
@@ -16,9 +18,9 @@ env:
 
 jobs:
   aocl:
-    name: cpufish-aocl tests (self-hosted, AOCL)
+    name: cpufish-aocl tests and S4 bench (self-hosted, AOCL)
     runs-on: [self-hosted, Windows, X64, aocl]
-    timeout-minutes: 60
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
@@ -65,3 +67,66 @@ jobs:
         run: |
           cargo test --locked -p cpufish-aocl --no-fail-fast -- --nocapture
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      # Timings are not a ranking unless this shows the CPU was quiet: record what ran and how busy it was.
+      - name: Machine and load (log only)
+        if: always()
+        shell: powershell
+        run: |
+          Get-CimInstance Win32_Processor | Select-Object Name, NumberOfCores, NumberOfLogicalProcessors, MaxClockSpeed | Format-List | Out-String
+          (Get-Counter '\Processor(_Total)\% Processor Time' -SampleInterval 2 -MaxSamples 3).CounterSamples | ForEach-Object { "cpu busy %: $([math]::Round($_.CookedValue,1))" }
+          Get-Process | Sort-Object CPU -Descending | Select-Object -First 8 Name, CPU | Format-Table | Out-String
+
+      # oneMKL is optional here: the bench below runs without it if it is not found.
+      - name: Find oneMKL (optional)
+        id: mkl
+        if: always()
+        shell: powershell
+        run: |
+          $root = Get-ChildItem -LiteralPath (Join-Path ${env:ProgramFiles(x86)} 'Intel\oneAPI') -Directory -ErrorAction SilentlyContinue |
+            Where-Object { Test-Path -LiteralPath (Join-Path $_.FullName 'include\mkl.h') } | Sort-Object Name -Descending | Select-Object -First 1
+          if ($root) {
+            [IO.File]::AppendAllText($env:GITHUB_ENV, "MKLROOT=$($root.FullName)`n")
+            [IO.File]::AppendAllText($env:GITHUB_PATH, (Join-Path $root.FullName 'bin') + "`n")
+            "MKLROOT: $($root.FullName)"
+            "mkl=found" | Out-File -Append -Encoding utf8 $env:GITHUB_OUTPUT
+          } else {
+            'oneMKL not found under Program Files (x86)\Intel\oneAPI; benching AOCL and portable only'
+            "mkl=absent" | Out-File -Append -Encoding utf8 $env:GITHUB_OUTPUT
+          }
+
+      - name: Build the bench (aocl)
+        if: always()
+        shell: powershell
+        run: |
+          cargo build --release --locked -p cpufish-bench --features aocl
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Copy-Item 'target\release\cpufish-bench.exe' (Join-Path $env:RUNNER_TEMP 'bench-aocl.exe')
+
+      - name: Build the bench (aocl + onemkl)
+        if: always() && steps.mkl.outputs.mkl == 'found'
+        shell: powershell
+        run: |
+          cargo build --release --locked -p cpufish-bench --features aocl,onemkl
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Copy-Item 'target\release\cpufish-bench.exe' (Join-Path $env:RUNNER_TEMP 'bench-both.exe')
+
+      # Library defaults (as Fuel runs), then pinned thread counts, each recorded separately.
+      - name: S4 bench
+        if: always()
+        shell: powershell
+        run: |
+          $both = Join-Path $env:RUNNER_TEMP 'bench-both.exe'
+          $exe = if (Test-Path -LiteralPath $both) { $both } else { Join-Path $env:RUNNER_TEMP 'bench-aocl.exe' }
+          "bench binary: $exe"
+          $sum = $env:GITHUB_STEP_SUMMARY
+          $bad = $false
+          foreach ($t in @($null, 1, 4)) {
+            $label = if ($null -eq $t) { 'library default threads' } else { "--threads $t" }
+            $head = "### S4 bench, $label ($(Split-Path -Leaf $exe))"
+            $out = if ($null -eq $t) { & $exe } else { & $exe --threads $t }
+            $head, $out
+            $head, $out | Out-File -Append -Encoding utf8 -FilePath $sum
+            if ($LASTEXITCODE -ne 0) { "bench exited $LASTEXITCODE for $label"; $bad = $true }
+          }
+          if ($bad) { exit 1 }

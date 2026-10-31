@@ -1,0 +1,67 @@
+# Runs the cpufish-aocl provider tests on a self-hosted Windows runner that has AMD AOCL installed (hosted runners have
+# no AOCL, so hosted CI cannot run them; ROADMAP row 3, CLAUDE.md "tests that cannot run on GitHub").
+#
+# Triggers: dispatch only. No pull_request (a PR would run our code on the maintainer's machine), no secrets, no
+# third-party actions. The runner is ephemeral: one job per registration, so every run is a deliberate act.
+name: aocl
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  aocl:
+    name: cpufish-aocl tests (self-hosted, AOCL)
+    runs-on: [self-hosted, Windows, X64, aocl]
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+
+      - name: Find AOCL, libiomp5md and libclang (fails loudly; nothing is installed or assumed)
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          # AOCL_ROOT is unset on the runner: look where the AOCL installer puts it.
+          $lib = Join-Path $env:ProgramFiles 'AMD\AOCL-Windows\amd-blis\lib\LP64'
+          foreach ($f in 'AOCL-LibBlis-Win-MT-dll.lib', 'AOCL-LibBlis-Win-MT-dll.dll') {
+            if (-not (Test-Path -LiteralPath (Join-Path $lib $f))) { throw "AOCL: $f not found in $lib (is AOCL installed for this account?)" }
+          }
+          [IO.File]::AppendAllText($env:GITHUB_PATH, "$lib`n")
+          "AOCL BLIS      : $lib"
+
+          # The multi-threaded BLIS needs libiomp5md.dll; AOCL does not ship it, oneAPI does.
+          $iomp = Get-ChildItem -LiteralPath (Join-Path ${env:ProgramFiles(x86)} 'Intel\oneAPI') -Filter libiomp5md.dll -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
+          if (-not $iomp) { throw 'libiomp5md.dll not found under Program Files (x86)\Intel\oneAPI (the multi-threaded BLIS cannot start without it)' }
+          [IO.File]::AppendAllText($env:GITHUB_PATH, "$($iomp.DirectoryName)`n")
+          "libiomp5md     : $($iomp.FullName)"
+
+          # bindgen (aocl-blas-sys) needs libclang.dll. Visual Studio's LLVM component ships it.
+          $clang = $env:LIBCLANG_PATH
+          if (-not ($clang -and (Test-Path -LiteralPath (Join-Path $clang 'libclang.dll')))) {
+            $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'
+            if (-not (Test-Path -LiteralPath $vswhere)) { throw "libclang: LIBCLANG_PATH unset and vswhere.exe not found at $vswhere" }
+            $vs = & $vswhere -latest -products '*' -property installationPath | Select-Object -First 1
+            $clang = if ($vs) { Join-Path $vs 'VC\Tools\Llvm\x64\bin' } else { $null }
+          }
+          if (-not ($clang -and (Test-Path -LiteralPath (Join-Path $clang 'libclang.dll')))) { throw "libclang.dll not found (LIBCLANG_PATH unset; Visual Studio LLVM component missing)" }
+          [IO.File]::AppendAllText($env:GITHUB_ENV, "LIBCLANG_PATH=$clang`n")
+          "libclang       : $clang"
+
+          foreach ($t in 'cargo', 'rustc') {
+            $c = Get-Command $t -ErrorAction SilentlyContinue
+            if (-not $c) { throw "$t is not on PATH for this account" }
+            "$t : $($c.Source)"
+          }
+
+      - name: cpufish-aocl tests
+        shell: powershell
+        run: |
+          cargo test --locked -p cpufish-aocl --no-fail-fast -- --nocapture
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

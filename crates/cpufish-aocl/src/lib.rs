@@ -153,6 +153,16 @@ impl Provider for Aocl {
         Config { threads, isa }
     }
 
+    fn set_threads(&self, n: usize) -> Result<(), Error> {
+        let value = aocl_blas_sys::dim_t::try_from(n)
+            .ok()
+            .filter(|&v| v >= 1)
+            .ok_or_else(|| Error::InvalidArgument(format!("thread count {n} out of range")))?;
+        // SAFETY: plain setter; BLIS keeps the value process-global, which the trait documents.
+        unsafe { aocl_blas_sys::bli_thread_set_num_threads(value) };
+        Ok(())
+    }
+
     fn gemm_f32(&self, args: &mut GemmArgs<'_, f32>) -> Result<(), Error> {
         gemm(args)
     }

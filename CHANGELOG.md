@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.0.8
+
+- `Provider::set_threads(n)` (defaulted, so not breaking): sets the library thread count, process-global, to be called once at startup. Implemented for `aocl` (`bli_thread_set_num_threads`), `onemkl` (`MKL_Set_Num_Threads`) and `portable` (accepts only 1).
+- `cpufish-bench --threads N` applies it before any gemm and prints the requested count beside each provider's effective config. Without it, providers run at library defaults as Fuel does.
+
 ## 0.0.7
 
 - New `crates/cpufish-bench` (S4): `cpufish-bench [--quick] [--reps N]` compares installed providers on Fuel-style gemm shapes (f32, NoTrans/NoTrans, alpha=1, beta=0, one gemm per slice) and checks each against `portable`. Vendor providers are cargo features `aocl`, `onemkl`, `onemkl-openmp`. `publish = false`.

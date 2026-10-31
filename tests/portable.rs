@@ -118,3 +118,13 @@ impl Provider for Liar {
 fn conformance_catches_a_wrong_provider() {
     assert!(conformance::check_provider(&Liar).is_err());
 }
+
+#[test]
+fn set_threads_portable_accepts_only_one_and_default_refuses() {
+    assert!(Portable::new().set_threads(1).is_ok());
+    assert!(matches!(
+        Portable::new().set_threads(4),
+        Err(Error::InvalidArgument(_))
+    ));
+    assert!(matches!(Liar.set_threads(1), Err(Error::Backend { .. })));
+}

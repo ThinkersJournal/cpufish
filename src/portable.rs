@@ -77,6 +77,16 @@ impl Provider for Portable {
         }
     }
 
+    fn set_threads(&self, n: usize) -> Result<(), Error> {
+        if n == 1 {
+            Ok(())
+        } else {
+            Err(Error::InvalidArgument(format!(
+                "portable is single-threaded; cannot set {n} threads"
+            )))
+        }
+    }
+
     fn gemm_f32(&self, args: &mut GemmArgs<'_, f32>) -> Result<(), Error> {
         run(args)
     }

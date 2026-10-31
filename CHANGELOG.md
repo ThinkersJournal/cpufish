@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.13
+
+- New `crates/cpufish-sys` (default member): a `libloading` run-time loader for CBLAS-ABI libraries with a safe, bounds-checked gemm; reads LP64/ILP64 from OpenBLAS's config string. New `crates/cpufish-openblas` (S5): `OpenBlas` provider over it, gemm f32/f64, `set_threads`, effective threads and kernel name; an absent library is `ProbeError::Unavailable`. Library found via `with_path`, `CPUFISH_OPENBLAS`, then platform default names. Not a default member. Both `publish = false`. Conformance against a real OpenBLAS is UNVERIFIED at this version.
+
 ## 0.0.12
 
 - CI only: the advisory `portfolio` job now pins coderipper's `portfolio.yml` at `db626e88` (coderipper 0.17.3, whose failure causes include the linker line) instead of `30e012b`.

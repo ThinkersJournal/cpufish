@@ -1,0 +1,13 @@
+[package]
+name = "cpufish-sys"
+version = "0.0.13"
+edition = "2024"
+rust-version = "1.95"
+description = "Run-time loader for CBLAS-ABI math libraries (OpenBLAS first) for CPUFish"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/ThinkersJournal/cpufish"
+publish = false
+
+[dependencies]
+libloading = "0.9"
+thiserror = "2"

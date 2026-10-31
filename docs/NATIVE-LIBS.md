@@ -102,6 +102,6 @@ what turned "Windows UNVERIFIED" into a measured result for LP64 (below).
   MAX_THREADS=64`, width Lp64; `ilp64` DLL gave `... USE64BITINT ...`, width Ilp64; both passed. Control: the `ilp64` DLL with
   `CPUFISH_OPENBLAS_EXPECT_WIDTH=lp64` fails (left Ilp64, right Lp64). Conformance against the `ilp64` DLL also passed.
   Scope: Windows x64, this Cooperlake DYNAMIC_ARCH build only. Example (single quotes, so the backslashes survive the shell):
-  `CPUFISH_OPENBLAS='C:\Program Files\OpenBLAS .3.34\ilp64\libopenblas.dll' CPUFISH_OPENBLAS_EXPECT_WIDTH=ilp64 cargo test -p cpufish-openblas loader_reports -- --nocapture`.
+  `CPUFISH_OPENBLAS='C:\Program Files\OpenBLAS\0.3.34\ilp64\libopenblas.dll' CPUFISH_OPENBLAS_EXPECT_WIDTH=ilp64 cargo test -p cpufish-openblas loader_reports -- --nocapture`.
 - **Not verified:** the install script's own install step (run by CireSnave, not by this lane); ILP64 on any other OS; any claim
   about AOCL's and oneMKL's installer hashes or directory permissions; macOS.

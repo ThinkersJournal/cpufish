@@ -165,7 +165,7 @@ dependencies = [
 
 [[package]]
 name = "cpufish"
-version = "0.0.14"
+version = "0.0.15"
 dependencies = [
  "gemm",
  "thiserror 2.0.21",
@@ -173,7 +173,7 @@ dependencies = [
 
 [[package]]
 name = "cpufish-aocl"
-version = "0.0.14"
+version = "0.0.15"
 dependencies = [
  "aocl-blas",
  "aocl-blas-sys",
@@ -183,7 +183,7 @@ dependencies = [
 
 [[package]]
 name = "cpufish-bench"
-version = "0.0.14"
+version = "0.0.15"
 dependencies = [
  "cpufish",
  "cpufish-aocl",
@@ -192,7 +192,7 @@ dependencies = [
 
 [[package]]
 name = "cpufish-onemkl"
-version = "0.0.14"
+version = "0.0.15"
 dependencies = [
  "cpufish",
  "onemkl",
@@ -200,7 +200,7 @@ dependencies = [
 
 [[package]]
 name = "cpufish-openblas"
-version = "0.0.14"
+version = "0.0.15"
 dependencies = [
  "cpufish",
  "cpufish-sys",
@@ -208,7 +208,7 @@ dependencies = [
 
 [[package]]
 name = "cpufish-sys"
-version = "0.0.14"
+version = "0.0.15"
 dependencies = [
  "libloading 0.9.0",
  "thiserror 2.0.21",

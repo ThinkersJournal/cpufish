@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.15
+
+- CI only: `aocl.yml` (dispatch only) now also runs the S4 bench in the same job as the `cpufish-aocl` tests, because the self-hosted runner is ephemeral (one job per registration). Steps: machine and CPU-load log, optional oneMKL discovery, bench build (aocl, and aocl+onemkl when oneMKL is found), then the bench at library-default threads, `--threads 1` and `--threads 4`, written to the job summary. Independent steps run `if: always()`.
+
 ## 0.0.14
 
 - CI only: new `openblas-linux` job installs `libopenblas0` on `ubuntu-latest` and runs `cpufish-openblas` clippy and tests with `CPUFISH_OPENBLAS_REQUIRED=1`, so conformance runs against a real library there. Windows stays UNVERIFIED.

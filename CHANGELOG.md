@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.18
+
+- `cpufish-bench` gains an `openblas` feature (run-time loaded, so it builds anywhere and the provider is skipped when no library is found). The hosted `openblas-linux` job now also runs `bench --quick` with it and fails unless `openblas` appears in the table.
+
 ## 0.0.17
 
 - Docs only: `docs/NATIVE-LIBS.md` records the Windows LP64 OpenBLAS 0.3.34 conformance run (5 passed, standard user), and adds test `loader_reports_the_expected_int_width` (runs only with `CPUFISH_OPENBLAS_EXPECT_WIDTH` and `CPUFISH_OPENBLAS` set). Windows x64 verified at both widths in the PM's run (width asserted, with a failing control); ILP64 elsewhere stays UNVERIFIED.

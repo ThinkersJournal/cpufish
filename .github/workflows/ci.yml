@@ -68,6 +68,9 @@ jobs:
       - run: dpkg -s libopenblas0 | grep -E '^(Package|Version):'
       - run: cargo clippy --locked -p cpufish-openblas --all-targets -- -D warnings
       - run: cargo test --locked -p cpufish-openblas -- --nocapture
+      - run: cargo clippy --locked -p cpufish-bench --features openblas --all-targets -- -D warnings
+      # The bench skips an absent provider, so assert OpenBLAS actually ran: its id must appear in the table.
+      - run: cargo run --locked --release -p cpufish-bench --features openblas -- --quick | tee bench.md && grep -q openblas bench.md
 
   doc:
     name: doc

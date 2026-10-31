@@ -22,7 +22,7 @@ OpenBLAS installer is `tools/install-openblas.ps1`; the loader order is in `crat
 
 | Library | Location | Pinned | How CPUFish finds it | Status |
 |---|---|---|---|---|
-| OpenBLAS | `%ProgramFiles%\OpenBLAS\0.3.34\lp64\libopenblas.dll` and `...\ilp64\libopenblas.dll` | 0.3.34 | run-time loader (`cpufish-sys`), order below | Linux/LP64 verified by CI; Windows LP64 verified (see below); **ILP64 UNVERIFIED** until tests run against it |
+| OpenBLAS | `%ProgramFiles%\OpenBLAS\0.3.34\lp64\libopenblas.dll` and `...\ilp64\libopenblas.dll` | 0.3.34 | run-time loader (`cpufish-sys`), order below | Linux/LP64 verified by CI; verified on Windows x64, both widths (see below); ILP64 elsewhere UNVERIFIED |
 | AOCL | `%ProgramFiles%\AMD\AOCL-Windows` (the AMD installer's default) | 5.3.2 on the dev box (version on the runner **UNVERIFIED**) | link-time (`aocl-blas-sys`); the OS loader needs `...\amd-blis\lib\LP64` on the **process** `PATH` | installer hash **not recorded** (PM to supply); the directory's ACL **UNVERIFIED** |
 | oneMKL | `%ProgramFiles(x86)%\Intel\oneAPI\2026.1` (the oneAPI installer's default) | 2026.1 (oneAPI) | link-time (`onemkl`); needs `...\bin` on the **process** `PATH` for `libiomp5md.dll` and the MKL DLLs | installer hash **not recorded** (PM to supply); the directory's ACL **UNVERIFIED** |
 
@@ -97,10 +97,11 @@ what turned "Windows UNVERIFIED" into a measured result for LP64 (below).
 - Verified on Windows (2026-10-31, `main` at 22fe912, standard user, `CPUFISH_OPENBLAS_REQUIRED=1`): `cargo test -p cpufish-openblas`
   loaded the installed 0.3.34 LP64 DLL from the default search path; 5 passed, 0 failed, including `conformance_against_installed_openblas`.
   The install was done by CireSnave (elevated); the PM checked the installed DLL hashes and ACL on disk.
-- ILP64 on Windows (PM, own session, `main` crates 0.0.16): conformance against the `ilp64` DLL path passed (1 passed, 0 failed;
-  OpenBLAS 0.3.34, Cooperlake). That run does not show the integer width, so ILP64 is **not** marked verified; the test
-  `loader_reports_the_expected_int_width` (`CPUFISH_OPENBLAS_EXPECT_WIDTH=lp64|ilp64` with `CPUFISH_OPENBLAS` set) exists to
-  assert it and has not yet been run on Windows.
-- **Not verified:** the install script's own install step (run by CireSnave, not by this lane); the integer width of the Windows
-  DLLs as seen by the loader; ILP64 anywhere; any claim about AOCL's and
-  oneMKL's installer hashes or directory permissions; macOS.
+- Integer width on Windows x64 (PM, own session, standard user, #18 head 134adfa, crates 0.0.17): `loader_reports_the_expected_int_width`
+  with `CPUFISH_OPENBLAS` set to the installed DLL: `lp64` DLL gave config `OpenBLAS 0.3.34 DYNAMIC_ARCH NO_AFFINITY Cooperlake
+  MAX_THREADS=64`, width Lp64; `ilp64` DLL gave `... USE64BITINT ...`, width Ilp64; both passed. Control: the `ilp64` DLL with
+  `CPUFISH_OPENBLAS_EXPECT_WIDTH=lp64` fails (left Ilp64, right Lp64). Conformance against the `ilp64` DLL also passed.
+  Scope: Windows x64, this Cooperlake DYNAMIC_ARCH build only. Example (single quotes, so the backslashes survive the shell):
+  `CPUFISH_OPENBLAS='C:\Program Files\OpenBLAS .3.34\ilp64\libopenblas.dll' CPUFISH_OPENBLAS_EXPECT_WIDTH=ilp64 cargo test -p cpufish-openblas loader_reports -- --nocapture`.
+- **Not verified:** the install script's own install step (run by CireSnave, not by this lane); ILP64 on any other OS; any claim
+  about AOCL's and oneMKL's installer hashes or directory permissions; macOS.

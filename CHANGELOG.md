@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.12
+
+- CI only: the advisory `portfolio` job now pins coderipper's `portfolio.yml` at `db626e88` (coderipper 0.17.3, whose failure causes include the linker line) instead of `30e012b`.
+
 ## 0.0.11
 
 - Docs only: `docs/S5-OPENBLAS-DESIGN.md`, the design for the `cpufish-sys` run-time loader and a `cpufish-openblas` provider (ROADMAP row 8). No code change.

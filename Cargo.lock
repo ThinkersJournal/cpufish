@@ -165,7 +165,7 @@ dependencies = [
 
 [[package]]
 name = "cpufish"
-version = "0.0.11"
+version = "0.0.12"
 dependencies = [
  "gemm",
  "thiserror 2.0.21",
@@ -173,7 +173,7 @@ dependencies = [
 
 [[package]]
 name = "cpufish-aocl"
-version = "0.0.11"
+version = "0.0.12"
 dependencies = [
  "aocl-blas",
  "aocl-blas-sys",
@@ -183,7 +183,7 @@ dependencies = [
 
 [[package]]
 name = "cpufish-bench"
-version = "0.0.11"
+version = "0.0.12"
 dependencies = [
  "cpufish",
  "cpufish-aocl",
@@ -192,7 +192,7 @@ dependencies = [
 
 [[package]]
 name = "cpufish-onemkl"
-version = "0.0.11"
+version = "0.0.12"
 dependencies = [
  "cpufish",
  "onemkl",

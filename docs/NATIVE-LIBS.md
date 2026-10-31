@@ -97,5 +97,10 @@ what turned "Windows UNVERIFIED" into a measured result for LP64 (below).
 - Verified on Windows (2026-10-31, `main` at 22fe912, standard user, `CPUFISH_OPENBLAS_REQUIRED=1`): `cargo test -p cpufish-openblas`
   loaded the installed 0.3.34 LP64 DLL from the default search path; 5 passed, 0 failed, including `conformance_against_installed_openblas`.
   The install was done by CireSnave (elevated); the PM checked the installed DLL hashes and ACL on disk.
-- **Not verified:** the install script's own install step (run by CireSnave, not by this lane); loading the Windows ILP64 DLL; ILP64 anywhere; any claim about AOCL's and
+- ILP64 on Windows (PM, own session, `main` crates 0.0.16): conformance against the `ilp64` DLL path passed (1 passed, 0 failed;
+  OpenBLAS 0.3.34, Cooperlake). That run does not show the integer width, so ILP64 is **not** marked verified; the test
+  `loader_reports_the_expected_int_width` (`CPUFISH_OPENBLAS_EXPECT_WIDTH=lp64|ilp64` with `CPUFISH_OPENBLAS` set) exists to
+  assert it and has not yet been run on Windows.
+- **Not verified:** the install script's own install step (run by CireSnave, not by this lane); the integer width of the Windows
+  DLLs as seen by the loader; ILP64 anywhere; any claim about AOCL's and
   oneMKL's installer hashes or directory permissions; macOS.

@@ -2,7 +2,7 @@
 
 ## 0.0.17
 
-- Docs only: `docs/NATIVE-LIBS.md` records the Windows LP64 OpenBLAS 0.3.34 conformance run (5 passed, standard user); Windows ILP64 stays UNVERIFIED.
+- Docs only: `docs/NATIVE-LIBS.md` records the Windows LP64 OpenBLAS 0.3.34 conformance run (5 passed, standard user); New test `loader_reports_the_expected_int_width` (runs only with `CPUFISH_OPENBLAS_EXPECT_WIDTH` and `CPUFISH_OPENBLAS` set). Windows ILP64 conformance passed in the PM's run but its integer width is unasserted, so ILP64 stays UNVERIFIED.
 
 ## 0.0.16
 

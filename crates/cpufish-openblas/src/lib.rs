@@ -295,6 +295,28 @@ mod tests {
         assert!(p.set_threads(2).is_err());
     }
 
+    /// Asserts the integer width the loader derives from the config string. Runs only when
+    /// `CPUFISH_OPENBLAS_EXPECT_WIDTH` is `lp64` or `ilp64` and `CPUFISH_OPENBLAS` names the library, so a
+    /// conformance pass can be tied to the width it ran at.
+    #[test]
+    fn loader_reports_the_expected_int_width() {
+        use cpufish_sys::IntWidth;
+        let (Some(want), Some(path)) = (
+            std::env::var_os("CPUFISH_OPENBLAS_EXPECT_WIDTH"),
+            std::env::var_os("CPUFISH_OPENBLAS"),
+        ) else {
+            return;
+        };
+        let want = match want.to_str() {
+            Some("lp64") => IntWidth::Lp64,
+            Some("ilp64") => IntWidth::Ilp64,
+            other => panic!("CPUFISH_OPENBLAS_EXPECT_WIDTH must be lp64 or ilp64, got {other:?}"),
+        };
+        let lib = Library::open(&[path]).expect("open");
+        eprintln!("config {:?} width {:?}", lib.config(), lib.int_width());
+        assert_eq!(lib.int_width(), want);
+    }
+
     /// The real library, found the normal way. `CPUFISH_OPENBLAS_REQUIRED=1` (set by the CI jobs that install
     /// OpenBLAS) makes a missing library a failure; elsewhere it is reported and the absent path is what the test
     /// above proves.

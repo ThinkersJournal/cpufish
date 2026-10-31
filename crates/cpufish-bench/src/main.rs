@@ -4,7 +4,7 @@
 //! alpha = 1, beta = 0, one gemm per batch slice (no batched gemm until measured). Every provider's output is
 //! checked against `portable` first, so a fast wrong answer is reported as such, not as a result.
 //!
-//! Usage: `cpufish-bench [--quick] [--reps N]`. Output is a Markdown table on stdout; configuration goes first.
+//! Usage: `cpufish-bench [--quick] [--reps N] [--threads N]`. Without `--threads` providers run at library defaults (as Fuel does). Output is a Markdown table on stdout; configuration goes first.
 
 use std::sync::Arc;
 use std::time::Instant;
@@ -73,11 +73,15 @@ fn median(v: &mut [f64]) -> f64 {
 fn main() {
     let mut quick = false;
     let mut reps = 5usize;
+    let mut threads: Option<usize> = None;
     let mut it = std::env::args().skip(1);
     while let Some(a) = it.next() {
         match a.as_str() {
             "--quick" => quick = true,
             "--reps" => reps = it.next().and_then(|v| v.parse().ok()).expect("--reps N"),
+            "--threads" => {
+                threads = Some(it.next().and_then(|v| v.parse().ok()).expect("--threads N"));
+            }
             other => panic!("unknown argument {other}"),
         }
     }
@@ -96,7 +100,21 @@ fn main() {
             }
         })
         .collect();
+    // Thread settings are process-global in BLIS and MKL: apply once, before any gemm, then report what is in force.
+    if let Some(n) = threads {
+        for p in &providers {
+            if let Err(e) = p.set_threads(n) {
+                eprintln!("{}: could not set {n} threads: {e}", p.id());
+            }
+        }
+    }
     println!("## Providers\n");
+    match threads {
+        Some(n) => {
+            println!("Requested threads: {n} (see each provider's effective config below).\n")
+        }
+        None => println!("Requested threads: none (library defaults).\n"),
+    }
     for p in &providers {
         println!(
             "- `{}` version={:?} config={:?}",

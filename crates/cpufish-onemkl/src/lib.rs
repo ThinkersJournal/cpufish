@@ -140,6 +140,15 @@ impl Provider for OneMkl {
         }
     }
 
+    fn set_threads(&self, n: usize) -> Result<(), Error> {
+        let value = i32::try_from(n)
+            .ok()
+            .filter(|&v| v >= 1)
+            .ok_or_else(|| Error::InvalidArgument(format!("thread count {n} out of range")))?;
+        onemkl::service::set_num_threads(value);
+        Ok(())
+    }
+
     fn gemm_f32(&self, args: &mut GemmArgs<'_, f32>) -> Result<(), Error> {
         gemm(args)
     }

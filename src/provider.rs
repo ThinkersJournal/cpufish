@@ -20,6 +20,18 @@ pub trait Provider: Send + Sync {
     /// The thread count and instruction set actually in force.
     fn effective_config(&self) -> Config;
 
+    /// Set the number of threads the library uses, or fail if it cannot.
+    ///
+    /// The setting is process-global in the vendor libraries (BLIS, MKL), not per provider value: call it once at
+    /// startup, before any gemm, then read [`effective_config`](Provider::effective_config) to see what is in force.
+    /// The default reports that the provider has no such control.
+    fn set_threads(&self, _n: usize) -> Result<(), Error> {
+        Err(Error::Backend {
+            provider: self.id(),
+            message: "setting the thread count is not supported".to_owned(),
+        })
+    }
+
     /// Single-precision gemm.
     fn gemm_f32(&self, _args: &mut GemmArgs<'_, f32>) -> Result<(), Error> {
         Err(Error::Unsupported {

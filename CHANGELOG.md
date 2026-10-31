@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.17
+
+- Docs only: `docs/NATIVE-LIBS.md` records the Windows LP64 OpenBLAS 0.3.34 conformance run (5 passed, standard user); Windows ILP64 stays UNVERIFIED.
+
 ## 0.0.16
 
 - New `docs/NATIVE-LIBS.md`: the native-library convention (one admin-owned read-only location per library and version, pinned version and zip SHA-256, never on `PATH`) for AOCL, oneMKL and OpenBLAS, and an elevated install procedure.

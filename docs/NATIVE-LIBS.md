@@ -22,7 +22,7 @@ OpenBLAS installer is `tools/install-openblas.ps1`; the loader order is in `crat
 
 | Library | Location | Pinned | How CPUFish finds it | Status |
 |---|---|---|---|---|
-| OpenBLAS | `%ProgramFiles%\OpenBLAS\0.3.34\lp64\libopenblas.dll` and `...\ilp64\libopenblas.dll` | 0.3.34 | run-time loader (`cpufish-sys`), order below | Linux/LP64 verified by CI; **Windows and ILP64 UNVERIFIED** until the install is done and tests run against it |
+| OpenBLAS | `%ProgramFiles%\OpenBLAS\0.3.34\lp64\libopenblas.dll` and `...\ilp64\libopenblas.dll` | 0.3.34 | run-time loader (`cpufish-sys`), order below | Linux/LP64 verified by CI; Windows LP64 verified (see below); **ILP64 UNVERIFIED** until tests run against it |
 | AOCL | `%ProgramFiles%\AMD\AOCL-Windows` (the AMD installer's default) | 5.3.2 on the dev box (version on the runner **UNVERIFIED**) | link-time (`aocl-blas-sys`); the OS loader needs `...\amd-blis\lib\LP64` on the **process** `PATH` | installer hash **not recorded** (PM to supply); the directory's ACL **UNVERIFIED** |
 | oneMKL | `%ProgramFiles(x86)%\Intel\oneAPI\2026.1` (the oneAPI installer's default) | 2026.1 (oneAPI) | link-time (`onemkl`); needs `...\bin` on the **process** `PATH` for `libiomp5md.dll` and the MKL DLLs | installer hash **not recorded** (PM to supply); the directory's ACL **UNVERIFIED** |
 
@@ -87,13 +87,15 @@ What step 2 does, in order, and stops at the first failure:
 
 The script does not load the DLL. After it ends with `OK`, tell the CPUFish lane; then, and only then, the lane runs
 `cargo test -p cpufish-openblas` against that install (a standard-user run, `CPUFISH_OPENBLAS_REQUIRED=1`), which is
-what turns "Windows UNVERIFIED" into a measured result.
+what turned "Windows UNVERIFIED" into a measured result for LP64 (below).
 
 ## What is and is not verified (2026-10-31)
 
 - Verified: the pins match fresh downloads (PowerShell 5.1); a mismatch is rejected; the search order's unit tests
   pass; the OpenBLAS provider passes the conformance suite against distribution OpenBLAS 0.3.26 (LP64) on hosted
   Linux.
-- **Not verified:** the install step itself (it needs an elevation this lane does not have and was told not to use);
-  the read-back on a real install; loading the Windows DLLs, either width; ILP64 anywhere; any claim about AOCL's and
+- Verified on Windows (2026-10-31, `main` at 22fe912, standard user, `CPUFISH_OPENBLAS_REQUIRED=1`): `cargo test -p cpufish-openblas`
+  loaded the installed 0.3.34 LP64 DLL from the default search path; 5 passed, 0 failed, including `conformance_against_installed_openblas`.
+  The install was done by CireSnave (elevated); the PM checked the installed DLL hashes and ACL on disk.
+- **Not verified:** the install script's own install step (run by CireSnave, not by this lane); loading the Windows ILP64 DLL; ILP64 anywhere; any claim about AOCL's and
   oneMKL's installer hashes or directory permissions; macOS.

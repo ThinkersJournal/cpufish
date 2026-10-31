@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.11
+
+- Docs only: `docs/S5-OPENBLAS-DESIGN.md`, the design for the `cpufish-sys` run-time loader and a `cpufish-openblas` provider (ROADMAP row 8). No code change.
+
 ## 0.0.10
 
 - New `.github/workflows/aocl.yml`: runs the `cpufish-aocl` tests on a self-hosted runner labelled `[self-hosted, Windows, X64, aocl]`. `workflow_dispatch` only, no secrets, no `pull_request` trigger. It locates AOCL, `libiomp5md.dll` and `libclang.dll` itself and fails loudly if any is missing.

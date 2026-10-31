@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 use crate::{Capability, Config, Dtype, Error, GemmArgs, Op, ProbeError};
 
 /// A CPU math library behind a uniform interface.

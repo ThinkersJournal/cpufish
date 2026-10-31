@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 //! The shared conformance suite: every provider must pass [`check_provider`] before it is trusted.
 //!
 //! The suite checks a provider's *claims* ([`Provider::capabilities`]) against a naive reference
@@ -128,7 +129,10 @@ fn check_dtype<T: Elem>(p: &dyn Provider) -> Result<(), String> {
     rejects_bad_arguments::<T>(p).map_err(|e| format!("{id} {:?}: {e}", T::DTYPE))
 }
 
-#[allow(clippy::too_many_arguments)]
+#[allow(
+    clippy::too_many_arguments,
+    reason = "mirrors the GemmArgs fields so each case reads as one call"
+)]
 fn args_for<'a, T>(
     ta: Trans,
     tb: Trans,

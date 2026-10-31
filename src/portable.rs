@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 //! The always-available provider: pure Rust, through the `gemm` crate, single-threaded.
 //!
 //! Single-threaded on purpose: results are then reproducible run to run, which makes it a stable

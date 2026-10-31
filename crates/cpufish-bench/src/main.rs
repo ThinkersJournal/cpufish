@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 //! Compare installed CPUFish providers on gemm shapes. Run: `cargo run --release -p cpufish-bench --features aocl,onemkl`.
 //!
 //! Shapes follow how Fuel calls gemm (docs/S2-AOCL-DESIGN.md, Fuel lane answers 2026-10-30): f32, NoTrans/NoTrans,
@@ -36,7 +37,10 @@ impl Rng {
     }
 }
 
-#[allow(unused_mut)] // vendors are installed only when their feature is on
+#[allow(
+    unused_mut,
+    reason = "vendors are installed only when their feature is on"
+)]
 fn registry() -> Registry {
     let mut r = Registry::with_portable();
     #[cfg(feature = "aocl")]

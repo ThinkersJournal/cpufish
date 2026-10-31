@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 //! Intel oneAPI MKL provider for CPUFish (S3), over the `onemkl` crate's cblas gemm.
 //!
 //! Link-time provider like `cpufish-aocl`: building and starting a program that includes it needs oneMKL.

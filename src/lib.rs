@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 //! CPUFish: a vendor-neutral CPU math layer with per-vendor providers selected at run time.
 //!
 //! This is the core crate (ROADMAP S1): the [`Provider`] trait, the [`Registry`], the always-available

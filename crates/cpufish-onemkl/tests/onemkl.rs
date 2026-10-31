@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 //! These need oneMKL installed and findable at run time. UNVERIFIED in CI until a self-hosted runner exists
 //! for this repo (see ROADMAP); run locally with `cargo test -p cpufish-onemkl`.
 

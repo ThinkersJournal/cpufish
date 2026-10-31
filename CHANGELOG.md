@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.9
+
+- Hygiene, no behaviour change: CI cargo steps run `--locked` (SUP-001); the two `allow` attributes carry `reason`; every `.rs` file starts with an SPDX identifier.
+
 ## 0.0.8
 
 - `Provider::set_threads(n)` (defaulted, so not breaking): sets the library thread count, process-global, to be called once at startup. Implemented for `aocl` (`bli_thread_set_num_threads`), `onemkl` (`MKL_Set_Num_Threads`) and `portable` (accepts only 1).

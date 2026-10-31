@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 //! AOCL (AMD BLIS) provider for CPUFish, S2 in `docs/S2-AOCL-DESIGN.md`.
 //!
 //! This is a link-time provider: building a program that includes it needs AOCL, and starting it needs the

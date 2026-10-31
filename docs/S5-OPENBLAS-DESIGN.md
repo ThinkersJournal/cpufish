@@ -17,7 +17,7 @@ link error", and adds a third vendor stack for A/B runs. One loader serves every
   kernel set, our "ISA"), `openblas_get_config` (build string, includes the version). Setter:
   `openblas_set_num_threads` (process-global, like BLIS).
 - ⚠️ **`blasint` is `int` (LP64) or 64-bit (ILP64) depending on the build**; the official Windows zips ship both
-  (`OpenBLAS-0.3.34-x64.zip`, `...-x64-64.zip`) and ILP64 builds may name their symbols differently (UNVERIFIED: check the exports of the `-64` zip before relying on a name). The loader
+  (`OpenBLAS-0.3.34-x64.zip`, `...-x64-64.zip`) and the two official builds export the SAME symbol names (measured 2026-10-31 in the `.def` files of the 0.3.34 zips), so the width cannot be told from a symbol; the loader reads `USE64BITINT` from `openblas_get_config`. The loader
   must pick one width explicitly (LP64 first; ILP64 is a later cargo feature) and reject a library of the other width
   rather than call it with the wrong argument size.
 - Windows on Arm (`woa64`) builds exist; that is untested here.

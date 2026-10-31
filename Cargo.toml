@@ -1,6 +1,6 @@
 [package]
 name = "cpufish"
-version = "0.0.12"
+version = "0.0.13"
 edition = "2024"
 rust-version = "1.95"
 description = "Vendor-neutral CPU math layer for Fuel with per-vendor providers selected at run time"
@@ -12,9 +12,9 @@ publish = false
 gemm = "0.19"
 thiserror = "2"
 
-# `cpufish-aocl` and `cpufish-onemkl` need a vendor install at build and run time, so it is a member but not a default member:
+# `cpufish-aocl` and `cpufish-onemkl` need a vendor install at build and run time, so they (and `cpufish-openblas`, whose tests need OpenBLAS) are members but not default members:
 # plain `cargo build/test/clippy` at the root (hosted CI) never touches it. Build one with `-p <crate>`.
 [workspace]
-members = [".", "crates/cpufish-aocl", "crates/cpufish-onemkl", "crates/cpufish-bench"]
-default-members = ["."]
+members = [".", "crates/cpufish-sys", "crates/cpufish-aocl", "crates/cpufish-onemkl", "crates/cpufish-openblas", "crates/cpufish-bench"]
+default-members = [".", "crates/cpufish-sys"]
 resolver = "3"

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.0.16
+
+- New `docs/NATIVE-LIBS.md`: the native-library convention (one admin-owned read-only location per library and version, pinned version and zip SHA-256, never on `PATH`) for AOCL, oneMKL and OpenBLAS, and an elevated install procedure.
+- New `tools/install-openblas.ps1`: downloads the pinned OpenBLAS 0.3.34 zips, checks both hashes before extracting, installs to `%ProgramFiles%\OpenBLAS\0.3.34\{lp64,ilp64}`, sets the ACL and reads it back; `-VerifyOnly` checks hashes without installing. Not run as an install by this lane.
+- `cpufish-openblas` search order: on Windows the default is now that install directory (no bare names, no `PATH`) and `CPUFISH_OPENBLAS` must be an absolute path; Linux/macOS unchanged. Behaviour change on Windows only; the crate is `publish = false`.
+
 ## 0.0.15
 
 - CI only: `aocl.yml` (dispatch only) now also runs the S4 bench in the same job as the `cpufish-aocl` tests, because the self-hosted runner is ephemeral (one job per registration). Steps: machine and CPU-load log, optional oneMKL discovery, bench build (aocl, and aocl+onemkl when oneMKL is found), then the bench at library-default threads, `--threads 1` and `--threads 4`, written to the job summary. Independent steps run `if: always()`.

@@ -3,16 +3,18 @@
 //!
 //! The library is loaded at run time by `cpufish-sys`, so this crate builds and links without OpenBLAS and an
 //! absent library is [`ProbeError::Unavailable`]. Where to look, in order: the path given to
-//! [`OpenBlas::with_path`], the `CPUFISH_OPENBLAS` environment variable, then the platform's default names.
+//! [`OpenBlas::with_path`], the `CPUFISH_OPENBLAS` environment variable, then the platform default (on Windows the
+//! install directory of `docs/NATIVE-LIBS.md`, never `PATH`).
 
-use std::ffi::OsString;
+use std::ffi::{OsStr, OsString};
+use std::path::Path;
 use std::sync::OnceLock;
 
 use cpufish::{Capability, Config, Dtype, Error, GemmArgs, Op, ProbeError, Provider, Trans};
 use cpufish_sys::{GemmCall, Library, Scalar};
 
 const ID: &str = "openblas";
-/// Environment variable naming the OpenBLAS shared library (a path, or a name the OS can resolve).
+/// Environment variable naming the OpenBLAS shared library (an absolute path on Windows).
 pub const ENV_VAR: &str = "CPUFISH_OPENBLAS";
 const NOTES: &str =
     "OpenBLAS cblas gemm, loaded at run time; threads per OPENBLAS_NUM_THREADS/OMP_NUM_THREADS";
@@ -29,12 +31,55 @@ const CAPS: [Capability; 2] = [
     },
 ];
 
-#[cfg(windows)]
-const DEFAULT_NAMES: &[&str] = &["libopenblas.dll", "openblas.dll"];
+/// The OpenBLAS release the install convention in `docs/NATIVE-LIBS.md` pins.
+pub const PINNED_VERSION: &str = "0.3.34";
+
 #[cfg(target_os = "macos")]
 const DEFAULT_NAMES: &[&str] = &["libopenblas.dylib", "libopenblas.0.dylib"];
 #[cfg(not(any(windows, target_os = "macos")))]
 const DEFAULT_NAMES: &[&str] = &["libopenblas.so.0", "libopenblas.so"];
+
+/// Where to look, in order (`docs/NATIVE-LIBS.md`): the explicit path, then `CPUFISH_OPENBLAS`, then the platform
+/// default. On Windows the default is the admin-owned install directory under `Program Files`, never a bare name:
+/// a bare name would be searched along `PATH` and the current directory, which the convention avoids, and
+/// `CPUFISH_OPENBLAS` must be an absolute path for the same reason.
+fn candidates(
+    windows: bool,
+    explicit: Option<&OsStr>,
+    env: Option<OsString>,
+    program_files: Option<OsString>,
+) -> Result<Vec<OsString>, String> {
+    if let Some(p) = explicit {
+        return Ok(vec![p.to_owned()]);
+    }
+    if let Some(p) = env.filter(|p| !p.is_empty()) {
+        if windows && !Path::new(&p).is_absolute() {
+            return Err(format!(
+                "{ENV_VAR} must be an absolute path to the library on Windows, got {p:?}"
+            ));
+        }
+        return Ok(vec![p]);
+    }
+    if windows {
+        let Some(pf) = program_files else {
+            return Err("ProgramFiles is not set, so the install directory is unknown".to_owned());
+        };
+        let root = Path::new(&pf).join("OpenBLAS").join(PINNED_VERSION);
+        // lp64 first (32-bit ints); the loader accepts either width.
+        return Ok(["lp64", "ilp64"]
+            .iter()
+            .map(|w| root.join(w).join("libopenblas.dll").into_os_string())
+            .collect());
+    }
+    #[cfg(not(windows))]
+    {
+        Ok(DEFAULT_NAMES.iter().map(OsString::from).collect())
+    }
+    #[cfg(windows)]
+    {
+        Ok(Vec::new())
+    }
+}
 
 /// The OpenBLAS provider. The library is opened on first use and kept for the life of the value.
 #[derive(Debug, Default)]
@@ -60,11 +105,12 @@ impl OpenBlas {
     fn library(&self) -> Result<&Library, String> {
         self.lib
             .get_or_init(|| {
-                let candidates: Vec<OsString> = match (&self.path, std::env::var_os(ENV_VAR)) {
-                    (Some(p), _) => vec![p.clone()],
-                    (None, Some(p)) if !p.is_empty() => vec![p],
-                    _ => DEFAULT_NAMES.iter().map(OsString::from).collect(),
-                };
+                let candidates = candidates(
+                    cfg!(windows),
+                    self.path.as_deref(),
+                    std::env::var_os(ENV_VAR),
+                    std::env::var_os("ProgramFiles"),
+                )?;
                 Library::open(&candidates).map_err(|e| e.to_string())
             })
             .as_ref()
@@ -184,6 +230,43 @@ impl Provider for OpenBlas {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn windows_default_is_the_install_dir_and_never_a_bare_name() {
+        let pf = OsString::from(r"C:\Program Files");
+        let c = candidates(true, None, None, Some(pf.clone())).unwrap();
+        let want = |w: &str| {
+            Path::new(&pf)
+                .join("OpenBLAS")
+                .join(PINNED_VERSION)
+                .join(w)
+                .join("libopenblas.dll")
+                .into_os_string()
+        };
+        assert_eq!(c, vec![want("lp64"), want("ilp64")]);
+        assert!(c.iter().all(|p| Path::new(p).components().count() > 1));
+        assert!(candidates(true, None, None, None).is_err());
+    }
+
+    #[test]
+    fn explicit_then_env_win_over_the_default() {
+        let explicit = OsString::from("x");
+        let c = candidates(true, Some(&explicit), Some("y".into()), None).unwrap();
+        assert_eq!(c, vec![OsString::from("x")]);
+        let c = candidates(false, None, Some("/opt/y.so".into()), None).unwrap();
+        assert_eq!(c, vec![OsString::from("/opt/y.so")]);
+        // An empty variable counts as unset.
+        assert!(candidates(true, None, Some("".into()), Some("PF".into())).is_ok());
+    }
+
+    #[test]
+    fn windows_env_var_must_be_absolute() {
+        let e = candidates(true, None, Some("libopenblas.dll".into()), None).unwrap_err();
+        assert!(e.contains(ENV_VAR), "{e}");
+        // `Path::is_absolute` is platform-specific, so only assert the accepted form where it applies.
+        #[cfg(windows)]
+        assert!(candidates(true, None, Some(r"C:\x\libopenblas.dll".into()), None).is_ok());
+    }
 
     /// With no library at all the provider is `Unavailable` and every call is a `Backend` error, never a crash.
     #[test]

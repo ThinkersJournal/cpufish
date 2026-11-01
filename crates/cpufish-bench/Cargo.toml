@@ -1,6 +1,6 @@
 [package]
 name = "cpufish-bench"
-version = "0.0.18"
+version = "0.0.19"
 edition = "2024"
 rust-version = "1.95"
 description = "Benchmark harness comparing CPUFish providers on Fuel-style gemm shapes"
@@ -17,7 +17,7 @@ onemkl-openmp = ["onemkl", "cpufish-onemkl/threading-intel-openmp"]
 openblas = ["dep:cpufish-openblas"]
 
 [dependencies]
-cpufish = { path = "../..", version = "0.0.18" }
-cpufish-aocl = { path = "../cpufish-aocl", version = "0.0.18", optional = true }
-cpufish-openblas = { path = "../cpufish-openblas", version = "0.0.18", optional = true }
-cpufish-onemkl = { path = "../cpufish-onemkl", version = "0.0.18", optional = true, default-features = false, features = ["threading-sequential"] }
+cpufish = { path = "../..", version = "0.0.19" }
+cpufish-aocl = { path = "../cpufish-aocl", version = "0.0.19", optional = true }
+cpufish-openblas = { path = "../cpufish-openblas", version = "0.0.19", optional = true }
+cpufish-onemkl = { path = "../cpufish-onemkl", version = "0.0.19", optional = true, default-features = false, features = ["threading-sequential"] }

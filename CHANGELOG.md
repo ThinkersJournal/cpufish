@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.19
+
+- CI only: `aocl.yml` load log reads CPU busy % from CIM instead of `Get-Counter`, which failed for the runner account in run 41228682257 and failed the step. Discovery found AOCL, libiomp5md and libclang there; `cargo` was not on that account's PATH (not fixed here: toolchain install is the PM's).
+
 ## 0.0.18
 
 - `cpufish-bench` gains an `openblas` feature (run-time loaded, so it builds anywhere and the provider is skipped when no library is found). The hosted `openblas-linux` job now also runs `bench --quick` with it and fails unless `openblas` appears in the table.

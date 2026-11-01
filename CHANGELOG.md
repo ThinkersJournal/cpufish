@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.21
+
+- CI: three hosted jobs run the provider tests against the real libraries (board 364, proof run 41348787718): `openblas-windows` (release zip, SHA-256 pinned), `onemkl-linux` (Intel apt repo, key pinned by fingerprint), `aocl-linux` (amd/blis 5.3.2 built from source at a pinned commit). Terms recorded in `docs/NATIVE-LIBS.md` "Hosted CI". Windows AOCL/oneMKL and the S4 bench stay on the local runner (`aocl.yml`).
+
 ## 0.0.20
 
 - Docs only: HANDOFF records the exact board 364 wait line and the current state. No code change.

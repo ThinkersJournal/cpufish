@@ -105,3 +105,24 @@ what turned "Windows UNVERIFIED" into a measured result for LP64 (below).
   `CPUFISH_OPENBLAS='C:\Program Files\OpenBLAS\0.3.34\ilp64\libopenblas.dll' CPUFISH_OPENBLAS_EXPECT_WIDTH=ilp64 cargo test -p cpufish-openblas loader_reports -- --nocapture`.
 - **Not verified:** the install script's own install step (run by CireSnave, not by this lane); ILP64 on any other OS; any claim
   about AOCL's and oneMKL's installer hashes or directory permissions; macOS.
+
+## Hosted CI (board 364, proven 2026-11-01, run 41348787718)
+
+Three jobs in `ci.yml` fetch a pinned artefact on a GitHub-hosted runner and run the provider's tests. None needs a login
+or a click-through. Terms were read from the sources below on 2026-11-01; they are quoted, not paraphrased.
+
+| Library | Hosted job | Fetch | Pin |
+|---|---|---|---|
+| OpenBLAS 0.3.34 | `openblas-windows` (and `openblas-linux`, distro package) | GitHub release zip | SHA-256 above |
+| oneMKL 2026.2 | `onemkl-linux` | Intel apt repo `https://apt.repos.intel.com/oneapi` | key fingerprint `E9BF 0AFC 46D6 E8B7 DA58 82F1 BAC6 F0C3 53D0 4109` (expires 2027-08-21; it signs the repo's `InRelease`) |
+| AOCL-BLAS (BLIS) 5.3.2 | `aocl-linux` | `git clone --branch 5.3.2 https://github.com/amd/blis`, built on the runner | commit `25cad99a6840855ade0a49871197f48ee0e1d317` |
+
+Licence quotes:
+
+- **OpenBLAS**, BSD-3 (`https://raw.githubusercontent.com/OpenMathLib/OpenBLAS/develop/LICENSE`): "Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met".
+- **oneMKL**, Intel Simplified Software License, October 2022 (`https://www.intel.com/content/www/us/en/developer/articles/license/end-user-license-agreement.html`): "You may use and redistribute the software, which is provided in binary form only, without modification, provided the following conditions are met"; no reverse engineering. Intel's FAQ (`https://www.intel.com/content/www/us/en/developer/articles/tool/onemkl-license-faq.html`): no royalty fees; "redistribution is allowed per the terms of the ISSL"; "you are allowed to perform these actions on any cloud server". Neither page names CI. The ISSL page was read to character 100000 of 149214.
+- **AOCL-BLIS**, BSD-3 plus MIT (`https://raw.githubusercontent.com/amd/blis/master/LICENSE`, v5.3.2): "Redistribution and use in source and binary forms, with or without modification, are permitted". Nothing is redistributed: the job builds from source and discards it.
+
+**Not read:** AMD's own EULA and download pages (amd.com timed out three times), so nothing here says AMD's prebuilt binaries or the AOCL-Windows installer may be used on a hosted runner; the source build avoids them. Windows AOCL, Windows oneMKL and the S4 bench stay on the local runner (`aocl.yml`); the bench also needs a quiet AMD box, which hosted runners are not.
+
+oneMKL on Linux needs an explicit link line in the test step (`-Wl,--no-as-needed -lmkl_intel_lp64 -lmkl_sequential -lmkl_core`); without it the test binary dies with `undefined symbol mkl_blas_dgemm`. The cause is in `onemkl-sys` (below).

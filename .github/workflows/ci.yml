@@ -72,6 +72,104 @@ jobs:
       # The bench skips an absent provider, so assert OpenBLAS actually ran: its id must appear in the table.
       - run: cargo run --locked --release -p cpufish-bench --features openblas -- --quick | tee bench.md && grep -q openblas bench.md
 
+  # Hosted proofs for the vendor libraries (board 364, run 41348787718). Each fetches a PINNED artefact, fails loudly
+  # on a mismatch, and fails the test if the library is not actually loaded. Terms: docs/NATIVE-LIBS.md "Hosted CI".
+  # Not covered here (local runner, aocl.yml): Windows AOCL/oneMKL load and the S4 bench (needs a quiet AMD box).
+  openblas-windows:
+    name: openblas (windows, release zip)
+    runs-on: windows-latest
+    env:
+      CPUFISH_OPENBLAS_REQUIRED: "1"
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: dtolnay/rust-toolchain@686976e191b89faba57d3206551f0f330d8cb249 # stable
+        with:
+          toolchain: stable
+      - name: Fetch OpenBLAS 0.3.34 (lp64), verify SHA-256, extract only bin/libopenblas.dll
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $url = 'https://github.com/OpenMathLib/OpenBLAS/releases/download/v0.3.34/OpenBLAS-0.3.34-x64.zip'
+          $want = 'e9cb6134541f36c27346d5fc5995652f060fba227cebbbabcbda5a5a44d7c76b'
+          $zip = Join-Path $env:RUNNER_TEMP 'ob.zip'
+          Invoke-WebRequest -Uri $url -OutFile $zip
+          $got = (Get-FileHash -Algorithm SHA256 $zip).Hash.ToLower()
+          if ($got -ne $want) { throw "OpenBLAS zip hash mismatch: $got" }
+          Add-Type -AssemblyName System.IO.Compression.FileSystem
+          $z = [IO.Compression.ZipFile]::OpenRead($zip)
+          try {
+            $e = $z.Entries | Where-Object { $_.FullName -eq 'bin/libopenblas.dll' }
+            if (@($e).Count -ne 1) { throw 'bin/libopenblas.dll not found exactly once' }
+            $dll = Join-Path $env:RUNNER_TEMP 'libopenblas.dll'
+            [IO.Compression.ZipFileExtensions]::ExtractToFile($e, $dll, $true)
+          } finally { $z.Dispose() }
+          "CPUFISH_OPENBLAS=$dll" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
+      - run: cargo test --locked -p cpufish-openblas -- --nocapture
+
+  onemkl-linux:
+    name: onemkl (ubuntu, Intel apt repo)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: dtolnay/rust-toolchain@686976e191b89faba57d3206551f0f330d8cb249 # stable
+        with:
+          toolchain: stable
+      - name: Install intel-oneapi-mkl-devel (apt key pinned by fingerprint)
+        run: |
+          set -euo pipefail
+          FPR=E9BF0AFC46D6E8B7DA5882F1BAC6F0C353D04109   # "Intel(R) Software Development Products", expires 2027-08-21
+          wget -qO "$RUNNER_TEMP/intel.pub" https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
+          export GNUPGHOME="$(mktemp -d)"
+          gpg --batch --import "$RUNNER_TEMP/intel.pub"
+          gpg --batch --list-keys --with-colons | grep -q "^fpr:::::::::${FPR}:" || { echo "Intel key $FPR not in the downloaded key file"; exit 1; }
+          gpg --batch --export "$FPR" | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg >/dev/null
+          echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq intel-oneapi-mkl-devel
+          dpkg -s intel-oneapi-mkl-devel | grep -E '^(Package|Version):'
+          MKL="$(readlink -f /opt/intel/oneapi/mkl/latest)"
+          echo "MKLROOT=$MKL" >> "$GITHUB_ENV"
+          echo "LD_LIBRARY_PATH=$MKL/lib:/opt/intel/oneapi/compiler/latest/lib" >> "$GITHUB_ENV"
+      # Without this link line the test binary dies "undefined symbol mkl_blas_dgemm" (onemkl-sys does not reach
+      # downstream test binaries; tracked in ciresnave/onemkl).
+      - name: cpufish-onemkl tests
+        env:
+          RUSTFLAGS: -C link-arg=-Wl,--no-as-needed -C link-arg=-L/opt/intel/oneapi/mkl/latest/lib -C link-arg=-lmkl_intel_lp64 -C link-arg=-lmkl_sequential -C link-arg=-lmkl_core
+        run: cargo test --locked -p cpufish-onemkl --no-fail-fast -- --nocapture
+
+  aocl-linux:
+    name: aocl (ubuntu, amd/blis 5.3.2 built from source)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: dtolnay/rust-toolchain@686976e191b89faba57d3206551f0f330d8cb249 # stable
+        with:
+          toolchain: stable
+      - name: Build amd/blis at a pinned commit and lay it out as an AOCL root
+        run: |
+          set -euo pipefail
+          PIN=25cad99a6840855ade0a49871197f48ee0e1d317   # amd/blis tag 5.3.2
+          sudo apt-get update -qq && sudo apt-get install -y -qq libclang-dev clang
+          git clone -q --branch 5.3.2 https://github.com/amd/blis "$RUNNER_TEMP/blis"
+          cd "$RUNNER_TEMP/blis"
+          [ "$(git rev-parse HEAD)" = "$PIN" ] || { echo "amd/blis 5.3.2 is not $PIN"; exit 1; }
+          ./configure --prefix="$RUNNER_TEMP/blis-install" --enable-cblas --enable-threading=openmp --enable-shared --disable-static --int-size=32 --blas-int-size=32 auto
+          make -j"$(nproc)"
+          make install
+          R="$RUNNER_TEMP/aocl-root/amd-blis"
+          mkdir -p "$R/include/LP64" "$R/lib/LP64"
+          cp -a "$RUNNER_TEMP"/blis-install/include/blis/. "$R/include/LP64/"
+          cp -a "$RUNNER_TEMP"/blis-install/lib/. "$R/lib/LP64/"
+          echo "AOCL_ROOT=$RUNNER_TEMP/aocl-root" >> "$GITHUB_ENV"
+          echo "LD_LIBRARY_PATH=$R/lib/LP64" >> "$GITHUB_ENV"
+      - run: cargo test --locked -p cpufish-aocl --no-fail-fast -- --nocapture
+
   doc:
     name: doc
     runs-on: ubuntu-latest

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.20
+
+- Docs only: HANDOFF records the exact board 364 wait line and the current state. No code change.
+
 ## 0.0.19
 
 - CI only: `aocl.yml` load log reads CPU busy % from CIM instead of `Get-Counter`, which failed for the runner account in run 41228682257 and failed the step. Discovery found AOCL, libiomp5md and libclang there; `cargo` was not on that account's PATH (not fixed here: toolchain install is the PM's).

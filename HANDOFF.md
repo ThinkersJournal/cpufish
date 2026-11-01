@@ -9,6 +9,8 @@ You own **CPUFish** (`ThinkersJournal/cpufish`, this checkout, keep on `main`) a
 - First `aocl.yml` run, 41228682257 (main 22fe912, FAILED): discovery found AOCL, libiomp5md (oneAPI 2026.1) and libclang (VS LLVM) for the runner account `gh-runner-cpufish`; `cargo is not on PATH for this account`, so tests, bench builds and bench never ran (no S4 numbers). Also `Get-Counter` threw (fixed in #20). The runner is EPHEMERAL: that run consumed the registration.
 
 ## Next action
+WAIT: board 364 toolchain+runner | check: runner shows online in the cpufish repo | wake: 2026-11-02T18:00:00Z
+
 1. Wait on the PM: (a) a Rust toolchain for `gh-runner-cpufish` (box state, the PM's; the workflow stays free of third-party actions), (b) a fresh runner registration, then the PM dispatches `aocl.yml` when the box is quiet. When it runs: read the log, fix failures in a PR, report run id and results as `[READY]`. Timings are a ranking only if the load log shows a quiet box; no numbers in docs otherwise.
 2. aocl row 3 (tests on real AOCL) closes with that run.
 3. Coderipper repin after a coderipper publish: `portfolio.yml@db626e88` installs coderipper 0.10.0, not 0.17.3.

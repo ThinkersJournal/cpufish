@@ -170,6 +170,82 @@ jobs:
           echo "LD_LIBRARY_PATH=$R/lib/LP64" >> "$GITHUB_ENV"
       - run: cargo test --locked -p cpufish-aocl --no-fail-fast -- --nocapture
 
+  # Windows counterparts (proof run 41351554183). oneMKL comes from Intel's PyPI packages (no login); AOCL-BLAS is
+  # built from the pinned amd/blis commit with CMake + ClangCL.
+  onemkl-windows:
+    name: onemkl (windows, PyPI mkl)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: dtolnay/rust-toolchain@686976e191b89faba57d3206551f0f330d8cb249 # stable
+        with:
+          toolchain: stable
+      - name: Install mkl, mkl-devel, mkl-include, intel-openmp (Intel's PyPI packages) into a prefix
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $p = Join-Path $env:RUNNER_TEMP 'mklpy'
+          python -m pip install --target $p "mkl==2026.2.0" "mkl-devel==2026.2.0" "mkl-include==2026.2.0" "intel-openmp==2026.2.0"
+          if ($LASTEXITCODE -ne 0) { throw 'pip failed' }
+          $lib = Join-Path $p 'Library'
+          foreach ($f in 'include\mkl.h', 'bin\libiomp5md.dll') {
+            if (-not (Test-Path -LiteralPath (Join-Path $lib $f))) { throw "$f missing under $lib" }
+          }
+          "MKLROOT=$lib" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
+          (Join-Path $lib 'bin') | Out-File -Append -Encoding utf8 $env:GITHUB_PATH
+      - run: cargo test --locked -p cpufish-onemkl --no-fail-fast -- --nocapture
+
+  aocl-windows:
+    name: aocl (windows, amd/blis 5.3.2 built from source)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: dtolnay/rust-toolchain@686976e191b89faba57d3206551f0f330d8cb249 # stable
+        with:
+          toolchain: stable
+      - name: Build amd/blis at a pinned commit (CMake, ClangCL)
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $pin = '25cad99a6840855ade0a49871197f48ee0e1d317'   # amd/blis tag 5.3.2
+          $src = Join-Path $env:RUNNER_TEMP 'blis'; $b = Join-Path $env:RUNNER_TEMP 'blis-build'
+          git clone -q --branch 5.3.2 https://github.com/amd/blis $src
+          if ((git -C $src rev-parse HEAD) -ne $pin) { throw "amd/blis 5.3.2 is not $pin" }
+          cmake -S $src -B $b -T ClangCL -DENABLE_THREADING=openmp -DBLIS_CONFIG_FAMILY=amdzen -DENABLE_CBLAS=ON -DBUILD_SHARED_LIBS=ON -DEXPORT_SHARED=all -DINT_SIZE=32 -DBLAS_INT_SIZE=32
+          if ($LASTEXITCODE -ne 0) { throw 'cmake configure failed' }
+          cmake --build $b --config Release -j 4
+          if ($LASTEXITCODE -ne 0) { throw 'cmake build failed' }
+      - name: Lay out as an AOCL root, find the x64 libclang
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $b = Join-Path $env:RUNNER_TEMP 'blis-build'; $src = Join-Path $env:RUNNER_TEMP 'blis'
+          $R = Join-Path $env:RUNNER_TEMP 'aocl-root\amd-blis'
+          New-Item -ItemType Directory -Force "$R\include\LP64", "$R\lib\LP64" | Out-Null
+          $lib = Get-ChildItem $b -Recurse -Filter 'AOCL-LibBlis-Win-MT-dll.lib' | Select-Object -First 1
+          $dll = Get-ChildItem $b -Recurse -Filter 'AOCL-LibBlis-Win-MT-dll.dll' | Select-Object -First 1
+          if (-not ($lib -and $dll)) { throw 'AOCL-LibBlis-Win-MT-dll.{lib,dll} not built' }
+          Copy-Item $lib.FullName, $dll.FullName "$R\lib\LP64"
+          $blisH = Get-ChildItem $b -Recurse -Filter blis.h | Select-Object -First 1
+          if (-not $blisH) { throw 'blis.h not generated' }
+          Copy-Item "$($blisH.DirectoryName)\*" "$R\include\LP64" -Recurse -Force
+          if (-not (Test-Path "$R\include\LP64\cblas.h")) {
+            $cb = Get-ChildItem $b, $src -Recurse -Filter cblas.h | Select-Object -First 1
+            if (-not $cb) { throw 'cblas.h not found' }
+            Copy-Item $cb.FullName "$R\include\LP64"
+          }
+          $clang = (Get-ChildItem 'C:\Program Files\Microsoft Visual Studio' -Recurse -Filter libclang.dll -ErrorAction SilentlyContinue |
+            Where-Object { $_.DirectoryName -like '*\Llvm\x64\bin' } | Select-Object -First 1).DirectoryName
+          if (-not $clang) { throw 'x64 libclang.dll not found under Visual Studio' }
+          "AOCL_ROOT=$(Join-Path $env:RUNNER_TEMP 'aocl-root')" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
+          "LIBCLANG_PATH=$clang" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
+          "$R\lib\LP64" | Out-File -Append -Encoding utf8 $env:GITHUB_PATH
+      - run: cargo test --locked -p cpufish-aocl --no-fail-fast -- --nocapture
+
   doc:
     name: doc
     runs-on: ubuntu-latest

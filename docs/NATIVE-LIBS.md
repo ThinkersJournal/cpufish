@@ -116,6 +116,8 @@ or a click-through. Terms were read from the sources below on 2026-11-01; they a
 | OpenBLAS 0.3.34 | `openblas-windows` (and `openblas-linux`, distro package) | GitHub release zip | SHA-256 above |
 | oneMKL 2026.2 | `onemkl-linux` | Intel apt repo `https://apt.repos.intel.com/oneapi` | key fingerprint `E9BF 0AFC 46D6 E8B7 DA58 82F1 BAC6 F0C3 53D0 4109` (expires 2027-08-21; it signs the repo's `InRelease`) |
 | AOCL-BLAS (BLIS) 5.3.2 | `aocl-linux` | `git clone --branch 5.3.2 https://github.com/amd/blis`, built on the runner | commit `25cad99a6840855ade0a49871197f48ee0e1d317` |
+| oneMKL 2026.2.0 (Windows) | `onemkl-windows` | `pip install mkl==2026.2.0 mkl-devel==2026.2.0 mkl-include==2026.2.0 intel-openmp==2026.2.0` (Intel's PyPI packages; PyPI licence field: "Intel Simplified Software License") | pinned versions (no hash pin yet) |
+| AOCL-BLAS 5.3.2 (Windows) | `aocl-windows` | same commit, built with CMake `-T ClangCL`; produces `AOCL-LibBlis-Win-MT-dll.{dll,lib}` | same commit; needs the x64 `libclang.dll` of Visual Studio's LLVM |
 
 Licence quotes:
 
@@ -123,6 +125,6 @@ Licence quotes:
 - **oneMKL**, Intel Simplified Software License, October 2022 (`https://www.intel.com/content/www/us/en/developer/articles/license/end-user-license-agreement.html`): "You may use and redistribute the software, which is provided in binary form only, without modification, provided the following conditions are met"; no reverse engineering. Intel's FAQ (`https://www.intel.com/content/www/us/en/developer/articles/tool/onemkl-license-faq.html`): no royalty fees; "redistribution is allowed per the terms of the ISSL"; "you are allowed to perform these actions on any cloud server". Neither page names CI. The ISSL page was read to character 100000 of 149214.
 - **AOCL-BLIS**, BSD-3 plus MIT (`https://raw.githubusercontent.com/amd/blis/master/LICENSE`, v5.3.2): "Redistribution and use in source and binary forms, with or without modification, are permitted". Nothing is redistributed: the job builds from source and discards it.
 
-**Not read:** AMD's own EULA and download pages (amd.com timed out three times), so nothing here says AMD's prebuilt binaries or the AOCL-Windows installer may be used on a hosted runner; the source build avoids them. Windows AOCL, Windows oneMKL and the S4 bench stay on the local runner (`aocl.yml`); the bench also needs a quiet AMD box, which hosted runners are not.
+**Not read:** AMD's own EULA and download pages (amd.com timed out three times), so nothing here says AMD's prebuilt binaries or the AOCL-Windows installer may be used on a hosted runner; the source builds avoid them. Benchmarks are not in CI at all (CireSnave 2026-11-01: "Benchmarks run locally on quiet machines.  Those don't have to be in CI at all."); run them by hand on a quiet box and record them in `docs/MEASUREMENTS.md`. The self-hosted `aocl.yml` workflow remains but nothing waits on it.
 
 oneMKL on Linux needs an explicit link line in the test step (`-Wl,--no-as-needed -lmkl_intel_lp64 -lmkl_sequential -lmkl_core`); without it the test binary dies with `undefined symbol mkl_blas_dgemm`. The cause is in `onemkl-sys` (below).

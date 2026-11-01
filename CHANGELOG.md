@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.22
+
+- CI: two more hosted jobs, Windows counterparts of 0.0.21 (proof run 41351554183): `onemkl-windows` (Intel's PyPI `mkl` packages, pinned 2026.2.0) and `aocl-windows` (amd/blis 5.3.2 at a pinned commit, CMake + ClangCL). HANDOFF rewritten: board 364 is archived and benchmarks are run by hand on a quiet machine (CireSnave), so no runner is awaited.
+
 ## 0.0.21
 
 - CI: three hosted jobs run the provider tests against the real libraries (board 364, proof run 41348787718): `openblas-windows` (release zip, SHA-256 pinned), `onemkl-linux` (Intel apt repo, key pinned by fingerprint), `aocl-linux` (amd/blis 5.3.2 built from source at a pinned commit). Terms recorded in `docs/NATIVE-LIBS.md` "Hosted CI". Windows AOCL/oneMKL and the S4 bench stay on the local runner (`aocl.yml`).

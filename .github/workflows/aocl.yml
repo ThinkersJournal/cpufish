@@ -74,7 +74,8 @@ jobs:
         shell: powershell
         run: |
           Get-CimInstance Win32_Processor | Select-Object Name, NumberOfCores, NumberOfLogicalProcessors, MaxClockSpeed | Format-List | Out-String
-          (Get-Counter '\Processor(_Total)\% Processor Time' -SampleInterval 2 -MaxSamples 3).CounterSamples | ForEach-Object { "cpu busy %: $([math]::Round($_.CookedValue,1))" }
+          # Get-Counter threw CounterApiError for the runner account (run 41228682257); CIM needs no perf-counter registry.
+          1..3 | ForEach-Object { "cpu busy %: $((Get-CimInstance Win32_Processor | Measure-Object LoadPercentage -Average).Average)"; Start-Sleep -Seconds 2 }
           Get-Process | Sort-Object CPU -Descending | Select-Object -First 8 Name, CPU | Format-Table | Out-String
 
       # oneMKL is optional here: the bench below runs without it if it is not found.

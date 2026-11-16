@@ -76,6 +76,30 @@ fn median(v: &mut [f64]) -> f64 {
     v[v.len() / 2]
 }
 
+const USAGE: &str = "Usage: cpufish-bench [--quick] [--reps N] [--threads N]
+
+Options:
+      --quick      small sizes only
+      --reps N     repetitions per size (default 5)
+      --threads N  thread count for every provider
+  -h, --help       print this help
+  -V, --version    print the version";
+
+fn usage_error(msg: &str) -> ! {
+    eprintln!(
+        "cpufish-bench: {msg}
+
+{USAGE}"
+    );
+    std::process::exit(2);
+}
+
+fn flag_value(it: &mut impl Iterator<Item = String>, flag: &str) -> usize {
+    it.next()
+        .and_then(|v| v.parse().ok())
+        .unwrap_or_else(|| usage_error(&format!("{flag} needs a number")))
+}
+
 fn main() {
     let mut quick = false;
     let mut reps = 5usize;
@@ -83,12 +107,18 @@ fn main() {
     let mut it = std::env::args().skip(1);
     while let Some(a) = it.next() {
         match a.as_str() {
-            "--quick" => quick = true,
-            "--reps" => reps = it.next().and_then(|v| v.parse().ok()).expect("--reps N"),
-            "--threads" => {
-                threads = Some(it.next().and_then(|v| v.parse().ok()).expect("--threads N"));
+            "-h" | "--help" => {
+                println!("{USAGE}");
+                return;
             }
-            other => panic!("unknown argument {other}"),
+            "-V" | "--version" => {
+                println!("cpufish-bench {}", env!("CARGO_PKG_VERSION"));
+                return;
+            }
+            "--quick" => quick = true,
+            "--reps" => reps = flag_value(&mut it, "--reps"),
+            "--threads" => threads = Some(flag_value(&mut it, "--threads")),
+            other => usage_error(&format!("unknown argument `{other}`")),
         }
     }
     let reg = registry();

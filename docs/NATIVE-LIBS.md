@@ -41,7 +41,7 @@ the symbols are not what differs. The width is told from `openblas_get_config`, 
 ILP64 build, and `cpufish-sys` picks the matching call signature.)
 
 AOCL and oneMKL are link-time providers (`docs/S2-AOCL-DESIGN.md`, option A): the program cannot start without
-their DLLs, so the directory must be on the `PATH` of *that process*. Set it per process (the `aocl.yml` job does it
+their DLLs, so the directory must be on the `PATH` of *that process*. Set it per process (the hosted CI jobs do it
 with `GITHUB_PATH`, which lasts one job; interactively, per shell), never machine-wide.
 
 ## Loader search order (OpenBLAS)
@@ -125,6 +125,6 @@ Licence quotes:
 - **oneMKL**, Intel Simplified Software License, October 2022 (`https://www.intel.com/content/www/us/en/developer/articles/license/end-user-license-agreement.html`): "You may use and redistribute the software, which is provided in binary form only, without modification, provided the following conditions are met"; no reverse engineering. Intel's FAQ (`https://www.intel.com/content/www/us/en/developer/articles/tool/onemkl-license-faq.html`): no royalty fees; "redistribution is allowed per the terms of the ISSL"; "you are allowed to perform these actions on any cloud server". Neither page names CI. The ISSL page was read to character 100000 of 149214.
 - **AOCL-BLIS**, BSD-3 plus MIT (`https://raw.githubusercontent.com/amd/blis/master/LICENSE`, v5.3.2): "Redistribution and use in source and binary forms, with or without modification, are permitted". Nothing is redistributed: the job builds from source and discards it.
 
-**Not read:** AMD's own EULA and download pages (amd.com timed out three times), so nothing here says AMD's prebuilt binaries or the AOCL-Windows installer may be used on a hosted runner; the source builds avoid them. Benchmarks are not in CI at all (CireSnave 2026-11-01: "Benchmarks run locally on quiet machines.  Those don't have to be in CI at all."); run them by hand on a quiet box and record them in `docs/MEASUREMENTS.md`. The self-hosted `aocl.yml` workflow remains but nothing waits on it.
+**Not read:** AMD's own EULA and download pages (amd.com timed out three times), so nothing here says AMD's prebuilt binaries or the AOCL-Windows installer may be used on a hosted runner; the source builds avoid them. Benchmarks are not in CI at all (CireSnave 2026-11-01: "Benchmarks run locally on quiet machines.  Those don't have to be in CI at all."); run them by hand on a quiet box and record them in `docs/MEASUREMENTS.md`. The self-hosted `aocl.yml` workflow was deleted in 0.0.23.
 
 oneMKL on Linux needs an explicit link line in the test step (`-Wl,--no-as-needed -lmkl_intel_lp64 -lmkl_sequential -lmkl_core`); without it the test binary dies with `undefined symbol mkl_blas_dgemm`. The cause is in `onemkl-sys` (below).

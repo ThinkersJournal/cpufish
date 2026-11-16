@@ -62,7 +62,7 @@ image has `libopenblas` (`apt install libopenblas-dev`, to be verified, not assu
 
 - Linux hosted: install `libopenblas0` on the runner image and run the provider tests for real (positive control: the
   same job asserts the library really was found, so a skipped load cannot pass as green).
-- Windows: the self-hosted runner (`aocl.yml` pattern, label `aocl` box) with an unpacked official zip; the
+- Windows: the hosted `openblas (windows, release zip)` job with the pinned official zip; the
   `CPUFISH_OPENBLAS` env var points at it. UNVERIFIED until the runner is registered.
 - Tests never `#[ignore]` (standing rule); an absent library is a probe result under test, not a skip.
 - Loader unit tests use a tiny test-only shared library or a deliberately missing name to prove `Unavailable`.

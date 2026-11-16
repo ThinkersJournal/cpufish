@@ -1,8 +1,9 @@
 # Changelog
 
-## Unreleased
+## 0.0.23
 
-- CI only: the advisory `portfolio` job moves to the shared workflow at coderipper `c72a6e0` (installs CodeRipper 0.47.5). `tools/migrate-rule-ids.py` finds no `.coderipper.toml` and no rule names in this repo, so nothing to migrate. Version allocated by the PM at gate time.
+- Deleted the vestigial self-hosted `.github/workflows/aocl.yml` (SUP-017; hosted jobs cover the providers, benchmarks run by hand). `cpufish-bench` gains `--help`/`--version` and exits 2 with usage on a bad flag or missing number instead of panicking (OPS-011).
+- CI only: the advisory `portfolio` job moves to the shared workflow at coderipper `c72a6e0` (installs CodeRipper 0.47.5). `tools/migrate-rule-ids.py` finds no `.coderipper.toml` and no rule names in this repo, so nothing to migrate.
 
 ## 0.0.22
 

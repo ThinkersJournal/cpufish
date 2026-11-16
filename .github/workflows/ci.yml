@@ -74,7 +74,7 @@ jobs:
 
   # Hosted proofs for the vendor libraries (board 364, run 41348787718). Each fetches a PINNED artefact, fails loudly
   # on a mismatch, and fails the test if the library is not actually loaded. Terms: docs/NATIVE-LIBS.md "Hosted CI".
-  # Not covered here (local runner, aocl.yml): Windows AOCL/oneMKL load and the S4 bench (needs a quiet AMD box).
+  # Not covered here (run by hand): Windows AOCL/oneMKL load and the S4 bench (needs a quiet AMD box).
   openblas-windows:
     name: openblas (windows, release zip)
     runs-on: windows-latest
@@ -270,4 +270,4 @@ jobs:
   portfolio:
     permissions:
       contents: read
-    uses: ciresnave/coderipper/.github/workflows/portfolio.yml@db626e884c6b1163f93d1e5c1fb0e2a2adc338b3
+    uses: ciresnave/coderipper/.github/workflows/portfolio.yml@c72a6e03479d914de8ea8a73609ba73e93a0de92

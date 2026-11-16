@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.0.23
+
+- Deleted the vestigial self-hosted `.github/workflows/aocl.yml` (SUP-017; hosted jobs cover the providers, benchmarks run by hand). `cpufish-bench` gains `--help`/`--version` and exits 2 with usage on a bad flag or missing number instead of panicking (OPS-011).
+- CI only: the advisory `portfolio` job moves to the shared workflow at coderipper `c72a6e0` (installs CodeRipper 0.47.5). `tools/migrate-rule-ids.py` finds no `.coderipper.toml` and no rule names in this repo, so nothing to migrate.
+
 ## 0.0.22
 
 - CI: two more hosted jobs, Windows counterparts of 0.0.21 (proof run 41351554183): `onemkl-windows` (Intel's PyPI `mkl` packages, pinned 2026.2.0) and `aocl-windows` (amd/blis 5.3.2 at a pinned commit, CMake + ClangCL). HANDOFF rewritten: board 364 is archived and benchmarks are run by hand on a quiet machine (CireSnave), so no runner is awaited.

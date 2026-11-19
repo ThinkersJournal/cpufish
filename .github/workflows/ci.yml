@@ -134,11 +134,9 @@ jobs:
           MKL="$(readlink -f /opt/intel/oneapi/mkl/latest)"
           echo "MKLROOT=$MKL" >> "$GITHUB_ENV"
           echo "LD_LIBRARY_PATH=$MKL/lib:/opt/intel/oneapi/compiler/latest/lib" >> "$GITHUB_ENV"
-      # Without this link line the test binary dies "undefined symbol mkl_blas_dgemm" (onemkl-sys does not reach
-      # downstream test binaries; tracked in ciresnave/onemkl).
+      # No RUSTFLAGS link line: onemkl 0.3.0 propagates it (ciresnave/onemkl#3). Before 0.3 the test binary died
+      # "undefined symbol mkl_blas_dgemm" without it.
       - name: cpufish-onemkl tests
-        env:
-          RUSTFLAGS: -C link-arg=-Wl,--no-as-needed -C link-arg=-L/opt/intel/oneapi/mkl/latest/lib -C link-arg=-lmkl_intel_lp64 -C link-arg=-lmkl_sequential -C link-arg=-lmkl_core
         run: cargo test --locked -p cpufish-onemkl --no-fail-fast -- --nocapture
 
   aocl-linux:

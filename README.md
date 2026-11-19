@@ -25,7 +25,7 @@ cargo test -p cpufish-onemkl   # needs oneMKL
 cargo test -p cpufish-openblas # needs OpenBLAS
 ```
 
-CI runs every provider's tests against the real library on GitHub-hosted runners (Linux and Windows); terms and pins are in `docs/NATIVE-LIBS.md` "Hosted CI". Benchmarks are not in CI: timings need a quiet machine and are run by hand.
+CI runs every provider's tests against the real library on GitHub-hosted runners (Linux and Windows); those provider jobs run on every PR but are not among the 7 required checks on `main` (fmt, clippy, test on three OSes, doc, cargo deny); terms and pins are in `docs/NATIVE-LIBS.md` "Hosted CI". Benchmarks are not in CI: timings need a quiet machine and are run by hand.
 
 The crate names `cpufish` and `cpufish-sys` are reserved on crates.io at 0.0.0; the code here is not yet published.
 

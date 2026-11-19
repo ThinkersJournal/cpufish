@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.24
+
+- `cpufish-onemkl` depends on `onemkl` 0.3 (was 0.2; ciresnave/onemkl#3 fixed in onemkl 0.3.0). The Linux `RUSTFLAGS` link-line workaround is dropped from the hosted `onemkl-linux` job and its tests pass without it (proof: run 44434675890, lp64 / link-dynamic / threading-sequential only; OpenMP, TBB and ILP64 untested). Public API unchanged: `onemkl` types appear only in private `use` lines, the public surface is the `OneMkl` provider struct. `Cargo.lock` relocks bindgen 0.73.2 with prettyplease 0.3.
+
 ## 0.0.23
 
 - Deleted the vestigial self-hosted `.github/workflows/aocl.yml` (SUP-017; hosted jobs cover the providers, benchmarks run by hand). `cpufish-bench` gains `--help`/`--version` and exits 2 with usage on a bad flag or missing number instead of panicking (OPS-011).

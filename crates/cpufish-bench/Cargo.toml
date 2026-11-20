@@ -17,6 +17,7 @@ onemkl-openmp = ["onemkl", "cpufish-onemkl/threading-intel-openmp"]
 openblas = ["dep:cpufish-openblas"]
 
 [dependencies]
+clap = { version = "4.6.8", features = ["derive"] }
 cpufish = { path = "../..", version = "0.0.25" }
 cpufish-aocl = { path = "../cpufish-aocl", version = "0.0.25", optional = true }
 cpufish-openblas = { path = "../cpufish-openblas", version = "0.0.25", optional = true }

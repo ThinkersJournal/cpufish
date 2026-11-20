@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.0.25
+
+- Docs: README rewritten to match the crates and hosted CI, and it now says the provider jobs run on every PR but are not among the 7 required checks on `main` (audited against branch protection and `ci.yml`, 2026-11-19). ROADMAP rows 3, 5, 6 and 8 updated to hosted CI and onemkl 0.3.
+- `cpufish-bench`: `--reps 0` is now a usage error (exit 2); it used to panic taking the median of an empty list. Public API unchanged.
+
 ## 0.0.24
 
 - `cpufish-onemkl` depends on `onemkl` 0.3 (was 0.2; ciresnave/onemkl#3 fixed in onemkl 0.3.0). The Linux `RUSTFLAGS` link-line workaround is dropped from the hosted `onemkl-linux` job and its tests pass without it (proof: run 44434675890, lp64 / link-dynamic / threading-sequential only; OpenMP, TBB and ILP64 untested). Public API unchanged: `onemkl` types appear only in private `use` lines, the public surface is the `OneMkl` provider struct. `Cargo.lock` relocks bindgen 0.73.2 with prettyplease 0.3.

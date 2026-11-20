@@ -116,7 +116,12 @@ fn main() {
                 return;
             }
             "--quick" => quick = true,
-            "--reps" => reps = flag_value(&mut it, "--reps"),
+            "--reps" => {
+                reps = flag_value(&mut it, "--reps");
+                if reps == 0 {
+                    usage_error("--reps must be at least 1");
+                }
+            }
             "--threads" => threads = Some(flag_value(&mut it, "--threads")),
             other => usage_error(&format!("unknown argument `{other}`")),
         }

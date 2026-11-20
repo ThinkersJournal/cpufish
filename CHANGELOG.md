@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.0.25
 
 - Docs: README rewritten to match the crates and hosted CI, and it now says the provider jobs run on every PR but are not among the 7 required checks on `main` (audited against branch protection and `ci.yml`, 2026-11-19). ROADMAP rows 3, 5, 6 and 8 updated to hosted CI and onemkl 0.3.
 - `cpufish-bench`: `--reps 0` is now a usage error (exit 2); it used to panic taking the median of an empty list. Public API unchanged.

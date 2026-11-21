@@ -10,6 +10,7 @@
 use std::sync::Arc;
 use std::time::Instant;
 
+use clap::Parser;
 use cpufish::{GemmArgs, Provider, Registry, Trans};
 
 /// (label, m, n, k). Square sizes, then transformer-style projections with a token count `m`.
@@ -76,56 +77,26 @@ fn median(v: &mut [f64]) -> f64 {
     v[v.len() / 2]
 }
 
-const USAGE: &str = "Usage: cpufish-bench [--quick] [--reps N] [--threads N]
-
-Options:
-      --quick      small sizes only
-      --reps N     repetitions per size (default 5)
-      --threads N  thread count for every provider
-  -h, --help       print this help
-  -V, --version    print the version";
-
-fn usage_error(msg: &str) -> ! {
-    eprintln!(
-        "cpufish-bench: {msg}
-
-{USAGE}"
-    );
-    std::process::exit(2);
-}
-
-fn flag_value(it: &mut impl Iterator<Item = String>, flag: &str) -> usize {
-    it.next()
-        .and_then(|v| v.parse().ok())
-        .unwrap_or_else(|| usage_error(&format!("{flag} needs a number")))
+/// Compare installed CPUFish providers on gemm shapes. Timings are NOT a ranking: run on a quiet machine.
+#[derive(Parser)]
+#[command(version)]
+struct Cli {
+    /// Small sizes only
+    #[arg(long)]
+    quick: bool,
+    /// Repetitions per size
+    #[arg(long, value_name = "N", default_value_t = 5, value_parser = clap::value_parser!(u32).range(1..))]
+    reps: u32,
+    /// Thread count for every provider (default: each library's own default, as Fuel runs)
+    #[arg(long, value_name = "N", value_parser = clap::value_parser!(u32).range(1..))]
+    threads: Option<u32>,
 }
 
 fn main() {
-    let mut quick = false;
-    let mut reps = 5usize;
-    let mut threads: Option<usize> = None;
-    let mut it = std::env::args().skip(1);
-    while let Some(a) = it.next() {
-        match a.as_str() {
-            "-h" | "--help" => {
-                println!("{USAGE}");
-                return;
-            }
-            "-V" | "--version" => {
-                println!("cpufish-bench {}", env!("CARGO_PKG_VERSION"));
-                return;
-            }
-            "--quick" => quick = true,
-            "--reps" => {
-                reps = flag_value(&mut it, "--reps");
-                if reps == 0 {
-                    usage_error("--reps must be at least 1");
-                }
-            }
-            "--threads" => threads = Some(flag_value(&mut it, "--threads")),
-            other => usage_error(&format!("unknown argument `{other}`")),
-        }
-    }
+    let cli = Cli::parse();
+    let quick = cli.quick;
+    let reps = cli.reps as usize;
+    let threads = cli.threads.map(|n| n as usize);
     let reg = registry();
     let providers: Vec<Arc<dyn Provider>> = reg
         .ids()

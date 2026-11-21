@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.26
+
+- `cpufish-bench` parses its arguments with `clap` 4.6.8 (derive; crates.io) instead of a hand-written loop (OPS-012). Flags unchanged (`--quick`, `--reps N`, `--threads N`, `-h`, `-V`); a bad flag or value still exits 2. Behaviour change: `--threads 0` is now rejected (it was passed to `set_threads`). `cpufish-bench` is `publish = false`, so no public crate API changes.
+
 ## 0.0.25
 
 - Docs: README rewritten to match the crates and hosted CI, and it now says the provider jobs run on every PR but are not among the 7 required checks on `main` (audited against branch protection and `ci.yml`, 2026-11-19). ROADMAP rows 3, 5, 6 and 8 updated to hosted CI and onemkl 0.3.

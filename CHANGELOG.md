@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.0.26
 
 - `cpufish-bench` parses its arguments with `clap` 4.6.8 (derive; crates.io) instead of a hand-written loop (OPS-012). Flags unchanged (`--quick`, `--reps N`, `--threads N`, `-h`, `-V`); a bad flag or value still exits 2. Behaviour change: `--threads 0` is now rejected (it was passed to `set_threads`). `cpufish-bench` is `publish = false`, so no public crate API changes.
 

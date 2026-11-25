@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased (version: pm-assist to allocate)
+## 0.0.27 (allocated by pm-assist 2026-11-25)
 
 - CI only: the advisory `portfolio` job pins coderipper `467fd259` (installs CodeRipper 0.48.1, CODERIPPER_VERSION at 467fd259).
 - `LICENSE-APACHE` is now the canonical Apache-2.0 text, byte-identical to the sageant copy (11358 bytes, sha256 cfc7749b96f6...); ours was 11282 bytes.

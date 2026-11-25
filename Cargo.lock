@@ -260,7 +260,7 @@ checksum = "1d07550c9036bf2ae0c684c4297d503f838287c83c53686d05370d0e139ae570"
 
 [[package]]
 name = "cpufish"
-version = "0.0.26"
+version = "0.0.27"
 dependencies = [
  "gemm",
  "thiserror 2.0.21",
@@ -268,7 +268,7 @@ dependencies = [
 
 [[package]]
 name = "cpufish-aocl"
-version = "0.0.26"
+version = "0.0.27"
 dependencies = [
  "aocl-blas",
  "aocl-blas-sys",
@@ -278,7 +278,7 @@ dependencies = [
 
 [[package]]
 name = "cpufish-bench"
-version = "0.0.26"
+version = "0.0.27"
 dependencies = [
  "clap",
  "cpufish",
@@ -289,7 +289,7 @@ dependencies = [
 
 [[package]]
 name = "cpufish-onemkl"
-version = "0.0.26"
+version = "0.0.27"
 dependencies = [
  "cpufish",
  "onemkl",
@@ -297,7 +297,7 @@ dependencies = [
 
 [[package]]
 name = "cpufish-openblas"
-version = "0.0.26"
+version = "0.0.27"
 dependencies = [
  "cpufish",
  "cpufish-sys",
@@ -305,7 +305,7 @@ dependencies = [
 
 [[package]]
 name = "cpufish-sys"
-version = "0.0.26"
+version = "0.0.27"
 dependencies = [
  "libloading 0.9.0",
  "thiserror 2.0.21",

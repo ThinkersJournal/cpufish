@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.0.27 (allocated by pm-assist 2026-11-25)
+
+- CI only: the advisory `portfolio` job pins coderipper `467fd259` (installs CodeRipper 0.48.1, CODERIPPER_VERSION at 467fd259).
+- `LICENSE-APACHE` is now the canonical Apache-2.0 text, byte-identical to the sageant copy (11358 bytes, sha256 cfc7749b96f6...); ours was 11282 bytes.
+
 ## 0.0.26
 
 - `cpufish-bench` parses its arguments with `clap` 4.6.8 (derive; crates.io) instead of a hand-written loop (OPS-012). Flags unchanged (`--quick`, `--reps N`, `--threads N`, `-h`, `-V`); a bad flag or value still exits 2. Behaviour change: `--threads 0` is now rejected (it was passed to `set_threads`). `cpufish-bench` is `publish = false`, so no public crate API changes.

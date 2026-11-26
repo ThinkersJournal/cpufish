@@ -125,7 +125,7 @@ dependencies = [
  "lazy_static",
  "lazycell",
  "log",
- "prettyplease 0.2.37",
+ "prettyplease",
  "proc-macro2",
  "quote",
  "regex",
@@ -145,7 +145,6 @@ dependencies = [
  "cexpr",
  "clang-sys",
  "log",
- "prettyplease 0.3.0",
  "proc-macro2",
  "quote",
  "regex",
@@ -666,21 +665,20 @@ checksum = "384b8ab6d37215f3c5301a95a4accb5d64aa607f1fcb26a11b5303878451b4fe"
 
 [[package]]
 name = "onemkl"
-version = "0.3.0"
+version = "0.4.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3218c1988ab4b4b6be35dea1e820dbc05373214c6d1007f72e22b6406bf97b6d"
+checksum = "99f5891d33d6aa229a877398b62bb2e4aa1e1549546c7cb9989e298064c8534c"
 dependencies = [
  "num-complex",
  "num-traits",
  "onemkl-sys",
- "thiserror 2.0.21",
 ]
 
 [[package]]
 name = "onemkl-sys"
-version = "0.3.0"
+version = "0.4.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2f4e3995229c271d6c6fed31634bce7b19652482f1615536f4a86fc83861c55e"
+checksum = "2ff8e3b425f13091fea7e064e1c1e5b264acb8ad3f20081cd463eca991d1a951"
 dependencies = [
  "bindgen 0.73.2",
 ]
@@ -699,16 +697,6 @@ checksum = "479ca8adacdd7ce8f1fb39ce9ecccbfe93a3f1344b3d0d97f20bc0196208f62b"
 dependencies = [
  "proc-macro2",
  "syn 2.0.119",
-]
-
-[[package]]
-name = "prettyplease"
-version = "0.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2bfe0f4c752e450fc2faf62654f1c134747922825d5b04ca717b8874f41a40c0"
-dependencies = [
- "proc-macro2",
- "syn 3.0.10",
 ]
 
 [[package]]

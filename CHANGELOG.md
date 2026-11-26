@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.28 (allocated by pm-assist 2026-11-26)
+
+- `cpufish-onemkl` depends on `onemkl` 0.4 (was 0.3; the lock resolves 0.4.4, with `onemkl-sys` 0.4.4). onemkl's only breaking change in 0.4.0 is `optim::solve_trnls_bounded` taking `TrnlsBounds`; this crate does not use it (it calls `blas::level3::gemm` and `service::*`). 0.4.1 and 0.4.2 are the Windows `c_long` fix (0.4.1 did not compile on Windows). Public API unchanged. `Cargo.lock` drops prettyplease 0.3. Checked locally on Windows: `clippy -D warnings` and the `cpufish-onemkl` tests pass; hosted Linux and Windows CI run the rest.
+
 ## 0.0.27 (allocated by pm-assist 2026-11-25)
 
 - CI only: the advisory `portfolio` job pins coderipper `467fd259` (installs CodeRipper 0.48.1, CODERIPPER_VERSION at 467fd259).

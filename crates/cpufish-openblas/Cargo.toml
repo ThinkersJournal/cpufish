@@ -1,13 +1,16 @@
 [package]
 name = "cpufish-openblas"
-version = "0.0.30"
+version = "0.0.31"
 edition = "2024"
 rust-version = "1.95"
 description = "OpenBLAS provider for CPUFish, loaded at run time"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/ThinkersJournal/cpufish"
+readme = "README.md"
+keywords = ["blas", "gemm", "linear-algebra", "cpu"]
+categories = ["mathematics", "science"]
 publish = false
 
 [dependencies]
-cpufish = { path = "../..", version = "0.0.30" }
-cpufish-sys = { path = "../cpufish-sys", version = "0.0.30" }
+cpufish = { path = "../..", version = "0.0.31" }
+cpufish-sys = { path = "../cpufish-sys", version = "0.0.31" }

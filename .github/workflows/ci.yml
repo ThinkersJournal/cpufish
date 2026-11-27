@@ -48,6 +48,9 @@ jobs:
         with:
           toolchain: stable
       - run: cargo test --locked --all-features --no-fail-fast
+      - name: README example runs and prints the documented output
+        shell: bash
+        run: cargo run --locked --example hello | grep -F 'portable computed [19.0, 22.0, 43.0, 50.0]'
 
   # `cpufish-openblas` is not a default member (its tests want a real library), so this job installs OpenBLAS from the
   # image's own apt and runs it. CPUFISH_OPENBLAS_REQUIRED=1 turns "library not found" into a test failure, and the
@@ -243,6 +246,17 @@ jobs:
           "LIBCLANG_PATH=$clang" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
           "$R\lib\LP64" | Out-File -Append -Encoding utf8 $env:GITHUB_PATH
       - run: cargo test --locked -p cpufish-aocl --no-fail-fast -- --nocapture
+
+  # MSRV: `rust-version` in every crate is 1.95; this job builds the default members on exactly that toolchain.
+  msrv:
+    name: msrv (1.95)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: dtolnay/rust-toolchain@686976e191b89faba57d3206551f0f330d8cb249 # stable
+        with:
+          toolchain: "1.95"
+      - run: cargo check --locked --all-targets
 
   doc:
     name: doc

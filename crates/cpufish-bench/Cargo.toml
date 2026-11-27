@@ -1,11 +1,14 @@
 [package]
 name = "cpufish-bench"
-version = "0.0.30"
+version = "0.0.31"
 edition = "2024"
 rust-version = "1.95"
 description = "Benchmark harness comparing CPUFish providers on Fuel-style gemm shapes"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/ThinkersJournal/cpufish"
+readme = "README.md"
+keywords = ["blas", "gemm", "linear-algebra", "cpu"]
+categories = ["mathematics", "science"]
 publish = false
 
 [features]
@@ -18,7 +21,7 @@ openblas = ["dep:cpufish-openblas"]
 
 [dependencies]
 clap = { version = "4.6.8", features = ["derive"] }
-cpufish = { path = "../..", version = "0.0.30" }
-cpufish-aocl = { path = "../cpufish-aocl", version = "0.0.30", optional = true }
-cpufish-openblas = { path = "../cpufish-openblas", version = "0.0.30", optional = true }
-cpufish-onemkl = { path = "../cpufish-onemkl", version = "0.0.30", optional = true, default-features = false, features = ["threading-sequential"] }
+cpufish = { path = "../..", version = "0.0.31" }
+cpufish-aocl = { path = "../cpufish-aocl", version = "0.0.31", optional = true }
+cpufish-openblas = { path = "../cpufish-openblas", version = "0.0.31", optional = true }
+cpufish-onemkl = { path = "../cpufish-onemkl", version = "0.0.31", optional = true, default-features = false, features = ["threading-sequential"] }

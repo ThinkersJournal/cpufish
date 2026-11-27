@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased (version: pm-assist to allocate)
+## 0.0.30 - 2026-11-27 (PM-allocated; non-breaking dependency take)
 
 - `cpufish-onemkl` depends on `onemkl` 0.5 (was 0.4; the lock resolves 0.5.0 with `onemkl-sys` 0.5.0, one copy). onemkl 0.5.0's only breaking change is `SummaryStats::impute_missing` becoming a free function; this repo does not use it (0 hits for `impute_missing`; the same grep finds `onemkl`). Public API unchanged (no onemkl types are re-exported). Checked locally on Windows (oneAPI 2026.1): `cargo test --workspace` passes (core 7, aocl 3, onemkl 3, openblas 6, sys 4).
 

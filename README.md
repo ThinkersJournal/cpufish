@@ -2,9 +2,20 @@
 
 A vendor-neutral CPU math layer for Fuel, with per-vendor providers selected at run time. Pre-1.0 (0.0.x): the API is not stable. Only gemm is covered so far.
 
+## Use it
+
+**cpufish is not released yet.** The `cpufish` on crates.io (0.0.0) is a name reservation with no code, not a release: `cargo add cpufish` gives you an empty crate. Until the first real publish, depend on this repository:
+
+```toml
+[dependencies]
+cpufish = { git = "https://github.com/ThinkersJournal/cpufish" }
+```
+
+or, from a clone, `cargo add cpufish --path <clone>`. The repository root *is* the `cpufish` package; the other crates in the table below live under `crates/`. The code below needs no features and no vendor library.
+
 ## Example
 
-Multiply two 2x2 matrices with the always-available `portable` provider (`examples/hello.rs`, built by `cargo test` and run by CI):
+Multiply two 2x2 matrices with the always-available `portable` provider. Paste this into a new project's `src/main.rs` and `cargo run`, or from a clone run `cargo run --example hello` (`examples/hello.rs`, built by `cargo test` and run by CI):
 
 ```rust
 use cpufish::{GemmArgs, Registry, Trans};

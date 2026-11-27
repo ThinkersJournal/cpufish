@@ -1,6 +1,6 @@
 [package]
 name = "cpufish-onemkl"
-version = "0.0.28"
+version = "0.0.29"
 edition = "2024"
 rust-version = "1.95"
 description = "Intel oneAPI MKL provider for CPUFish"
@@ -15,5 +15,5 @@ threading-sequential = ["onemkl/threading-sequential"]
 threading-intel-openmp = ["onemkl/threading-intel-openmp"]
 
 [dependencies]
-cpufish = { path = "../..", version = "0.0.28" }
+cpufish = { path = "../..", version = "0.0.29" }
 onemkl = { version = "0.4", default-features = false, features = ["lp64", "link-dynamic", "blas"] }

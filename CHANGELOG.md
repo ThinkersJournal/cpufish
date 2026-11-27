@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased (pm-assist to allocate)
+## 0.0.29 (allocated by pm-assist 2026-11-27)
 
 - `cpufish-aocl` depends on `aocl-blas`, `aocl-blas-sys` and `aocl-types` 0.2 (were 0.1; the lock resolves 0.2.5 for all five aocl crates, one copy each). Public API unchanged (`aocl_types` is used only inside `cpufish-aocl`). `Cargo.lock` drops bindgen 0.69.5 and its tree (which, with `which`, `itertools`, `rustix`, `windows-sys 0.59`, ...), and bindgen 0.73.2 now pairs syn 3 with prettyplease 0.3. Checked locally on Windows (AOCL 5.3.2 BLIS plus oneAPI `libiomp5md`): `cargo test --workspace` passes (core 7, aocl 3, onemkl 3, openblas 6, sys 4), `clippy -p cpufish-aocl -D warnings` clean.
 

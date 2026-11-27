@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.0.32 - 2026-11-27 (PM-allocated; non-breaking dependency take: onemkl ~0.6, no onemkl type re-exported; README first-use fixes; cpufish stays unpublished)
+
+- `cpufish-onemkl` depends on `onemkl` 0.6 (was 0.5; the lock resolves 0.6.1 with `onemkl-sys` 0.6.1, one copy: `cargo tree -d` lists no onemkl). onemkl 0.6 breaks cell-callback wrappers and makes option/config structs `non_exhaustive` (with builders); this repo uses none (0 hits for `onemkl::df`, `Integrate` and onemkl struct literals; the same grep finds the 7 `onemkl::` references, all `blas::level3::gemm` and `service::*`). Public API unchanged. `Cargo.lock` keeps bindgen 0.73.2 on syn 3 with prettyplease 0.3 (the bump alone flipped it to syn 2; restored). Checked locally on Windows (oneAPI 2026.1, PowerShell): `cargo test --workspace --locked` passes (core 7, aocl 3, onemkl 3, openblas 6, sys 4).
+- Docs: README 'Use it' (git dependency until the first publish; crates.io 0.0.0 is a name reservation; the root is the `cpufish` package) and `cargo run --example hello`.
+
 ## 0.0.31 - 2026-11-27 (PM-allocated; non-breaking: first-release readiness; cpufish stays unpublished)
 
 - First-release readiness: `examples/hello.rs` and a README example (CI runs it and checks its output); an `msrv (1.95)` CI job; `LICENSE-MIT`/`LICENSE-APACHE`, a README, `keywords` and `categories` in every crate; lock moves `clap` 4.6.10 and `libloading` 0.9.1. Checklist: `docs/FIRST-RELEASE.md`.

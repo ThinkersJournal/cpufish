@@ -29,7 +29,7 @@ Verdict per item: **PASS** / **GAP** (a fact that blocks or needs a decision) / 
   `Cargo.toml`, `src/`, `tests/`, and for the root crate also the docs, `tools/install-openblas.ps1`, CI and
   `HANDOFF.md`/`ROADMAP.md` (no `exclude` is set; whether to ship those is a call). No `.dll/.so/.lib/.a/.dylib` is in
   any list. The dependency crates the providers use also ship none: `aocl-blas-sys 0.2.5` (12 files),
-  `aocl-build 0.2.5` (10), `onemkl-sys 0.5.0` (9), read from the registry sources with the extension filter above (0 binary files;
+  `aocl-build 0.2.5` (10), `onemkl-sys 0.6.0` (9; file count measured at 0.5.0, not re-counted), read from the registry sources with the extension filter above (0 binary files;
   control: the same filter lists `.rs`, `.toml` files, so it sees files).
 - **Per dependency, linked vs shipped, and conditions read** (sources and quotes are in `docs/NATIVE-LIBS.md` "Hosted CI",
   read 2026-11-01; not re-read today):
@@ -84,7 +84,7 @@ already carry a `version`.
   Control: the same pattern finds those 8, so it matches the syntax in use.
 - `Cargo.lock`: 92 `source = "registry+https://github.com/rust-lang/crates.io-index"` entries, 0 `git+` sources, 98 `name =`
   entries (the 6 workspace crates are the 6 without a `source`). Every external dependency is a crates.io version, including
-  `aocl-*` 0.2.5 and `onemkl` 0.5.0 (the `ciresnave`/ThinkersJournal crates are on crates.io, per CLAUDE.md section 9).
+  `aocl-*` 0.2.5 and `onemkl` 0.6.0 (the `ciresnave`/ThinkersJournal crates are on crates.io, per CLAUDE.md section 9).
 - **Latest-version check (crates.io API, 2026-11-27; every direct dependency of the six crates, one row per dependency):**
 
   | Crate | Dependency | Requirement | Locked (was) | Latest | Note |
@@ -93,7 +93,7 @@ already carry a `version`.
   | cpufish, cpufish-sys | thiserror | ^2 | 2.0.21 | 2.0.21 | current (1.0.69 also locked, transitive via `gemm`) |
   | cpufish-sys | libloading | ^0.9 | 0.9.1 (was 0.9.0) | 0.9.1 | lock moved on this branch; 0.8.9 also locked, transitive |
   | cpufish-aocl | aocl-blas, aocl-blas-sys, aocl-types | ^0.2 | 0.2.5 | 0.2.5 | current |
-  | cpufish-onemkl | onemkl | ^0.5 | 0.5.0 | 0.5.0 | current |
+  | cpufish-onemkl | onemkl | ^0.6 | 0.6.0 | 0.6.0 | current |
   | cpufish-bench | clap | ^4.6.8 | 4.6.10 (was 4.6.8) | 4.6.10 | lock moved on this branch |
 
   No lag remains among direct dependencies. Not checked: the latest of transitive dependencies other than those two `cargo

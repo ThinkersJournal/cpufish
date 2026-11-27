@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased (version: pm-assist to allocate)
+## 0.0.31 - 2026-11-27 (PM-allocated; non-breaking: first-release readiness; cpufish stays unpublished)
 
 - First-release readiness: `examples/hello.rs` and a README example (CI runs it and checks its output); an `msrv (1.95)` CI job; `LICENSE-MIT`/`LICENSE-APACHE`, a README, `keywords` and `categories` in every crate; lock moves `clap` 4.6.10 and `libloading` 0.9.1. Checklist: `docs/FIRST-RELEASE.md`.
 - **Yank policy:** a version is yanked only for a correctness bug that silently gives wrong numbers, a security problem, or a licence/provenance error. An ordinary bug is fixed forward in a patch release. Each yank is recorded here with the reason and the fixing version.

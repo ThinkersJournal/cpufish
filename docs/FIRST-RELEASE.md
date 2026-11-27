@@ -2,56 +2,28 @@
 
 Asked by pm-kernels 2026-11-27 ([TASK] first-release-readiness; PM: GO for the check only). **cpufish stays unpublished and
 unqueued.** Facts only; anything not read or run is marked UNVERIFIED. Measured at `origin/main` 4a4f42c (0.0.30), on
-rustc 1.100.0 / cargo 1.100.0, Windows 11, 2026-11-27. The licence and provenance *decision* is CireSnave's.
+rustc 1.100.0 / cargo 1.100.0, Windows 11, 2026-11-27. **Updated on the `first-release-readiness` branch after the PM rulings of 2026-11-27: items marked FIXED below are fixed on that branch (not on `main` until its PR merges).** The licence and provenance *decision* is CireSnave's.
 
 Verdict per item: **PASS** / **GAP** (a fact that blocks or needs a decision) / **UNVERIFIED**.
 
 ## 1. README hello-world and the fresh-eyes trial
 
-- **GAP: the README has no example.** It has a crate table and `cargo test` lines. There is no hello-world, so a stranger
-  cannot copy one. `src/lib.rs` has no doc example either: `grep` for a code fence in `src/*.rs` finds none (the only
-  tests that use the API are `tests/portable.rs`, which are tests, not an example).
-- **Compiled in CI?** Not applicable yet, for the same reason. What CI would compile today: `cargo test --locked
-  --all-features` (3 OSes) compiles `tests/` and doc examples (there are none); `cargo doc` runs with `-D warnings`.
-  Once an example exists, `examples/hello.rs` plus the existing `cargo test` job would compile it (cargo builds examples
-  during `cargo test`) and a README `include_str!`/doctest would tie the README text to it. UNVERIFIED until built.
-- **Draft of the intended example** (about 13 lines; compiled and run once by hand in a scratch `examples/hello.rs` at
-  4a4f42c, then removed, so nothing is committed): output `portable computed [19.0, 22.0, 43.0, 50.0]`.
-
-  ```rust
-  use cpufish::{GemmArgs, Registry, Trans};
-
-  fn main() -> Result<(), cpufish::Error> {
-      let registry = Registry::with_portable();
-      let provider = registry.available().into_iter().next().expect("portable is always available");
-      let (a, b) = ([1.0_f32, 2.0, 3.0, 4.0], [5.0_f32, 6.0, 7.0, 8.0]); // 2x2 row-major
-      let mut c = [0.0_f32; 4];
-      provider.gemm_f32(&mut GemmArgs {
-          trans_a: Trans::No, trans_b: Trans::No, m: 2, n: 2, k: 2,
-          alpha: 1.0, a: &a, lda: 2, b: &b, ldb: 2, beta: 0.0, c: &mut c, ldc: 2,
-      })?;
-      println!("{} computed {c:?}", provider.id());
-      Ok(())
-  }
-  ```
-
-  Ease observation (facts, not a ruling): a 2x2 multiply takes a 13-field struct (`GemmArgs`) with explicit leading
-  dimensions and transposes; there is no `provider.gemm(a, b)` convenience. That is the 80% case for 6.24 and is not
-  yet one obvious short path. A vendor provider needs its library installed and its own crate (`cpufish-aocl` etc.), so the
-  README's first example can only be `portable` today.
-- **Does EXPECTATIONS 6.24 apply to cpufish?** UNVERIFIED. 6.24's text says "*Ant projects"; the word "Ant" appears nowhere in
-  this repo and `PORTFOLIO-ROADMAP.md` lists CPUFish as Fuel's CPU backend lane, not under an Ant name. The rule's ground
-  ("developer-facing") does fit a crate consumers will call. PM/pm-kernels to say. **The trial was NOT run:** an agent
-  given only today's README has no example to reach, so the result would be a certain fail and say nothing new. Run it
-  (Sonnet sub-agent, model pinned, README only, must reach `portable computed [19.0, 22.0, 43.0, 50.0]`) after the example
-  lands.
+- **FIXED: the README has an example** (`examples/hello.rs`, copied into the README with its output
+  `portable computed [19.0, 22.0, 43.0, 50.0]`). `cargo test` builds it; the CI `test` job then runs
+  `cargo run --example hello` and `grep -F`s that output, so the README text and the example cannot drift apart silently
+  (the README copy itself is not machine-compared to the file: UNVERIFIED against drift in the README text only).
+  Run by hand on this branch: prints the documented line.
+- Ease observation (facts, not a ruling): a 2x2 multiply takes a 13-field `GemmArgs` with explicit leading dimensions
+  and transposes; there is no `provider.gemm(a, b)` convenience. The first example can only be `portable`, since a vendor
+  provider needs its library installed.
+- **6.24 applies to cpufish** (PM ruling via pm-kernels, 2026-11-27: developer-facing, though not an Ant). **Fresh-eyes
+  trial: NOT yet run.** It goes after this PR merges (a Sonnet sub-agent, model pinned, given only the README, must reach
+  the example's output) and before the first non-placeholder release; its summary goes in the PR body or a follow-up.
 
 ## 2. Licences, NOTICE, and what is linked vs shipped
 
 - **Our files:** `LICENSE-MIT` and `LICENSE-APACHE` exist at the repo root; every crate declares `MIT OR Apache-2.0`.
-  **No `NOTICE` file** exists (`git ls-files` lists none). **GAP (packaging):** `cargo package --list` (run offline with
-  `--allow-dirty`; `publish = false` did not stop it) shows only the root crate `cpufish` carries `LICENSE-MIT` and
-  `LICENSE-APACHE`; `cpufish-sys`, `-aocl`, `-onemkl`, `-openblas` and `-bench` carry **no licence file**. Only
+  **No `NOTICE` file** exists (`git ls-files` lists none). **FIXED on the branch:** every subcrate now carries copies of `LICENSE-MIT` and `LICENSE-APACHE` (as measured at 4a4f42c, only the root crate did). Only
   `cpufish` and `cpufish-sys` are the intended first publish (the others are `publish = false` and see section 7).
 - **Does any crate ship library bytes? No.** Package contents (`cargo package --list`): `cpufish` and every subcrate are
   `Cargo.toml`, `src/`, `tests/`, and for the root crate also the docs, `tools/install-openblas.ps1`, CI and
@@ -81,34 +53,29 @@ Verdict per item: **PASS** / **GAP** (a fact that blocks or needs a decision) / 
   `[sources]` denies unknown registries and git; one advisory is ignored (RUSTSEC-2024-0436 `paste`, via `gemm`, PM
   ruling 2026-10-30).
 
-## 3. Crate metadata (from each `Cargo.toml` at 4a4f42c)
+## 3. Crate metadata
 
 All six crates: `version = 0.0.30`, `edition = 2024`, `rust-version = 1.95`, `license = "MIT OR Apache-2.0"`,
-`repository = https://github.com/ThinkersJournal/cpufish`, `publish = false`, and a `description`.
-
-| Crate | description | readme | keywords | categories | homepage/docs |
-|---|---|---|---|---|---|
-| `cpufish` | yes | **no key** (cargo auto-finds `README.md`? UNVERIFIED) | none | none | none |
-| `cpufish-sys` | yes | none; no README file in the crate dir | none | none | none |
-| `cpufish-aocl` | yes | none | none | none | none |
-| `cpufish-onemkl` | yes | none | none | none | none |
-| `cpufish-openblas` | yes | none | none | none | none |
-| `cpufish-bench` | yes | file exists, no key | none | none | none |
-
-**GAP:** no `keywords`, `categories`, `readme`, `homepage` or `documentation` anywhere. Only the root crate has a README
-file; `cpufish-sys` (the other intended first publish) has none, so its crates.io page would be empty. All of `publish =
-false` must be lifted per crate at publish time (the PM's call), and the path dependencies already carry a `version`
-(e.g. `cpufish = { path = "../..", version = "0.0.30" }`), which is the publishable form.
+`repository = https://github.com/ThinkersJournal/cpufish`, `publish = false`, a `description`. **FIXED on the branch:**
+each now also has `readme = "README.md"` (a README file exists in every crate dir: `cpufish-sys`, `-aocl`, `-onemkl`,
+`-openblas` got a short one), `keywords = ["blas", "gemm", "linear-algebra", "cpu"]` and
+`categories = ["mathematics", "science"]`. Still not set: `homepage`, `documentation` (crates.io/docs.rs default to the
+repository and docs.rs; a call, not a gap). `publish = false` stays until the PM lifts it per crate; path dependencies
+already carry a `version`.
 
 ## 4. MSRV stated and tested
 
 - **Stated:** `rust-version = "1.95"` in all six crates.
-- **Tested in CI: no.** `ci.yml` has no MSRV job; every job uses `toolchain: stable`. **GAP.**
-- **Measured by hand today:** `cargo +1.94.0 check -p cpufish --offline` refuses with "rustc 1.94.0 is not supported ...
-  requires rustc 1.95" (cargo enforces the field, so 1.94 cannot even start); `cargo +1.96 check -p cpufish -p cpufish-sys
-  --locked` finishes. **1.95 itself is not installed on this box, so 1.95 exactly is UNVERIFIED**, and I did not install it
-  (no system installs). Whether 1.95 is the true floor (versus an overstated one) is unmeasured: edition 2024 needs 1.85,
-  and what needs 1.95 is not recorded here.
+- **FIXED: tested in CI.** New job `msrv (1.95)` runs `cargo check --locked --all-targets` on exactly 1.95 (not yet a
+  required check on `main`).
+- **Measured by hand 2026-11-27 (Windows):** `cargo +1.95 check --locked --all-targets` passes for the default members.
+  `cargo +1.94.0` refuses ("requires rustc 1.95"), as cargo enforces the field. With `--ignore-rust-version`,
+  `cargo +<v> check --locked` of the default members finished on 1.94.0, 1.90, 1.88 and 1.85; `-p cpufish-openblas`,
+  `-bench`, `-onemkl` and `-aocl` finished on 1.85 too, and `--all-targets` of the default members on 1.85. So the
+  code itself builds back to the edition-2024 floor (1.85); what sets 1.95 is the workspace's own declaration: `onemkl`
+  and `onemkl-sys` (ours, on crates.io) declare `rust-version = 1.95`. The number is kept at 1.95 for all crates (one
+  version rule) and the CI job holds it; lowering the core crates alone is a call for PM/CireSnave. Control: 1.94 is
+  refused without the flag, so the flag was doing its work.
 
 ## 5. No path or git dependencies
 
@@ -118,9 +85,20 @@ false` must be lifted per crate at publish time (the PM's call), and the path de
 - `Cargo.lock`: 92 `source = "registry+https://github.com/rust-lang/crates.io-index"` entries, 0 `git+` sources, 98 `name =`
   entries (the 6 workspace crates are the 6 without a `source`). Every external dependency is a crates.io version, including
   `aocl-*` 0.2.5 and `onemkl` 0.5.0 (the `ciresnave`/ThinkersJournal crates are on crates.io, per CLAUDE.md section 9).
-- Not checked: that each of those crates.io versions is the **latest** (rule: "all dependencies on their most recent versions"):
-  last measured by the dependency-take PRs #29-#31 today; `libloading` 0.8.9 is also in the lock (a transitive second
-  version; cargo-deny `multiple-versions = "warn"`).
+- **Latest-version check (crates.io API, 2026-11-27; every direct dependency of the six crates, one row per dependency):**
+
+  | Crate | Dependency | Requirement | Locked (was) | Latest | Note |
+  |---|---|---|---|---|---|
+  | cpufish | gemm | ^0.19 | 0.19.0 | 0.19.0 | current |
+  | cpufish, cpufish-sys | thiserror | ^2 | 2.0.21 | 2.0.21 | current (1.0.69 also locked, transitive via `gemm`) |
+  | cpufish-sys | libloading | ^0.9 | 0.9.1 (was 0.9.0) | 0.9.1 | lock moved on this branch; 0.8.9 also locked, transitive |
+  | cpufish-aocl | aocl-blas, aocl-blas-sys, aocl-types | ^0.2 | 0.2.5 | 0.2.5 | current |
+  | cpufish-onemkl | onemkl | ^0.5 | 0.5.0 | 0.5.0 | current |
+  | cpufish-bench | clap | ^4.6.8 | 4.6.10 (was 4.6.8) | 4.6.10 | lock moved on this branch |
+
+  No lag remains among direct dependencies. Not checked: the latest of transitive dependencies other than those two `cargo
+  update` steps touched (the lock has 7 and 6 "unchanged dependencies behind latest" notes from cargo; their reasons are not
+  investigated here, UNVERIFIED).
 
 ## 6. Yank policy
 
@@ -128,33 +106,22 @@ false` must be lifted per crate at publish time (the PM's call), and the path de
   control: the same search finds "placeholder" and "publish").
 - Portfolio facts read: CireSnave 2026-10-11 (`CIRESNAVE-EXPECTATIONS.md` section 6.11, verbatim there): *"We can always
   yank anything that is wrong after the fact."* — the PM may publish any release without asking; yanks have been used
-  elsewhere (auth-framework 0.4.2, item 32). Proposed default for cpufish (a proposal, not a ruling): a version is yanked only for
+  elsewhere (auth-framework 0.4.2, item 32). **Yank policy (written on this branch, now also in `CHANGELOG.md`):** a version is yanked only for
   a correctness bug that silently gives wrong numbers, a security problem, or a licence/provenance error; an ordinary bug is
   fixed forward in a patch release; each yank is recorded in `CHANGELOG.md` with the reason and the fixing version.
 
-## 7. What the 0.0.0 placeholder reserved vs the workspace's crate names
+## 7. Crate names
 
-Read from the crates.io API on 2026-11-27 (control: both found, four 404):
+**FIXED (PM, 2026-11-27, via pm-kernels):** all six workspace names are reserved by us on crates.io (the PM published 0.0.0
+placeholders for `cpufish-aocl`, `cpufish-onemkl`, `cpufish-openblas`, `cpufish-bench`; `cpufish` and `cpufish-sys` were
+reserved 2026-10-30). Read on 2026-11-27 before that ruling: both placeholders existed, the four others returned 404;
+UNVERIFIED by me after the PM's publish (not re-read). The placeholders' repository field was empty and can only change
+with a release.
 
-| Workspace crate | On crates.io | Note |
-|---|---|---|
-| `cpufish` | **0.0.0**, created 2026-10-30 17:40Z | reserved; no repository set on the placeholder |
-| `cpufish-sys` | **0.0.0**, created 2026-10-30 17:40Z | reserved; no repository set |
-| `cpufish-aocl` | 404 | **name not reserved** |
-| `cpufish-onemkl` | 404 | **name not reserved** |
-| `cpufish-openblas` | 404 | **name not reserved** |
-| `cpufish-bench` | 404 | **name not reserved**; `publish = false`, a binary harness, probably never published |
+## Summary of what remains for the PM
 
-**GAP (decision):** four workspace names are unreserved, and a vendor provider crate cannot be a path dependency of a published
-`cpufish` consumer, so any release that has users of `-aocl`, `-onemkl` or `-openblas` needs those names reserved first (or
-those crates kept unpublished and the README saying so). Also: the placeholder's repository field is empty (cannot be changed
-without a release).
-
-## Summary of gaps for the PM
-
-1. No README hello-world; no compiled example in CI (section 1). 6.24 applicability UNVERIFIED; trial not run.
-2. Subcrates ship no licence file; no `NOTICE`; AMD's EULA not read (section 2). cpufish ships no vendor bytes.
-3. No keywords/categories/readme; no README for `cpufish-sys` (section 3).
-4. No MSRV job in CI; 1.95 itself untested (section 4).
-5. Four names unreserved (section 7). No cpufish yank policy written (section 6).
-Item 5 of the TASK (no path/git deps, every dep on a published version) is PASS apart from the not-re-measured "latest".
+Fixed on the branch: README example with a CI run; MSRV job; licence files in each subcrate; keywords/categories/readme;
+yank policy; latest-version check (two lock moves); names (PM). **Remain:** the 6.24 fresh-eyes trial (after merge, before
+the first non-placeholder release); no `NOTICE` file; AMD's EULA not read; ISSL read only to 100000 of 149214 characters;
+whether to ship `HANDOFF.md`/`ROADMAP.md`/CI files in the root package (`exclude`); lowering the core crates' MSRV below
+1.95 (builds to 1.85); the first-release decision itself (PM).

@@ -6,6 +6,9 @@ rust-version = "1.95"
 description = "Benchmark harness comparing CPUFish providers on Fuel-style gemm shapes"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/ThinkersJournal/cpufish"
+readme = "README.md"
+keywords = ["blas", "gemm", "linear-algebra", "cpu"]
+categories = ["mathematics", "science"]
 publish = false
 
 [features]

@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased (version: pm-assist to allocate)
+
+- First-release readiness: `examples/hello.rs` and a README example (CI runs it and checks its output); an `msrv (1.95)` CI job; `LICENSE-MIT`/`LICENSE-APACHE`, a README, `keywords` and `categories` in every crate; lock moves `clap` 4.6.10 and `libloading` 0.9.1. Checklist: `docs/FIRST-RELEASE.md`.
+- **Yank policy:** a version is yanked only for a correctness bug that silently gives wrong numbers, a security problem, or a licence/provenance error. An ordinary bug is fixed forward in a patch release. Each yank is recorded here with the reason and the fixing version.
+
 ## 0.0.30 - 2026-11-27 (PM-allocated; non-breaking dependency take)
 
 - `cpufish-onemkl` depends on `onemkl` 0.5 (was 0.4; the lock resolves 0.5.0 with `onemkl-sys` 0.5.0, one copy). onemkl 0.5.0's only breaking change is `SummaryStats::impute_missing` becoming a free function; this repo does not use it (0 hits for `impute_missing`; the same grep finds `onemkl`). Public API unchanged (no onemkl types are re-exported). Checked locally on Windows (oneAPI 2026.1): `cargo test --workspace` passes (core 7, aocl 3, onemkl 3, openblas 6, sys 4).

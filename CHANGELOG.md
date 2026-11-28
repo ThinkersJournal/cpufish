@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Lock moves `onemkl` and `onemkl-sys` 0.6.1 to 0.6.5 (the PM's ILP64 bundle; `Cargo.toml` still says `0.6`; this repo does not enable `ilp64`, a library crate must not). Produced with `cargo update -p onemkl --precise 0.6.5` then `cargo update -p bindgen --precise 0.73.2` (the first alone leaves bindgen on syn 2 beside prettyplease 0.3 on syn 3; the second puts it back on syn 3). `cargo test --workspace --locked` passes on Windows (oneAPI 2026.1).
+
 ## 0.0.32 - 2026-11-27 (PM-allocated; non-breaking dependency take: onemkl ~0.6, no onemkl type re-exported; README first-use fixes; cpufish stays unpublished)
 
 - `cpufish-onemkl` depends on `onemkl` 0.6 (was 0.5; the lock resolves 0.6.1 with `onemkl-sys` 0.6.1, one copy: `cargo tree -d` lists no onemkl). onemkl 0.6 breaks cell-callback wrappers and makes option/config structs `non_exhaustive` (with builders); this repo uses none (0 hits for `onemkl::df`, `Integrate` and onemkl struct literals; the same grep finds the 7 `onemkl::` references, all `blas::level3::gemm` and `service::*`). Public API unchanged. `Cargo.lock` keeps bindgen 0.73.2 on syn 3 with prettyplease 0.3 (the bump alone flipped it to syn 2; restored). Checked locally on Windows (oneAPI 2026.1, PowerShell): `cargo test --workspace --locked` passes (core 7, aocl 3, onemkl 3, openblas 6, sys 4).

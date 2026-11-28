@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.35 - 2026-11-27 (PM-allocated; non-breaking: lock-only move of onemkl and onemkl-sys 0.6.7 to 0.6.8; written by pm-assist from the diff)
+
+- `Cargo.lock` only: `onemkl` and `onemkl-sys` 0.6.7 -> 0.6.8 (both on crates.io; the 0.6.8 release fixes the `InterpolateEx1D` search call-back negative-status read; cpufish has 0 `InterpolateEx1D` references (the lane's grep at origin/main c6e1971), so it is not affected either way). `cargo check -p cpufish-onemkl --locked` ok. cpufish stays unpublished (a placeholder on crates.io).
+
 ## 0.0.34 - 2026-11-27 (PM-allocated; non-breaking: lock-only move of onemkl and onemkl-sys 0.6.5 to 0.6.7; written by pm-assist from the diff)
 
 - `Cargo.lock` only: `onemkl` and `onemkl-sys` 0.6.5 -> 0.6.7 (both on crates.io; `Cargo.toml` still says `0.6`; `ilp64` is not enabled). The lane: bindgen needed no relock; `cpufish-onemkl` tests 3/3 on Windows. cpufish stays unpublished (a placeholder on crates.io).

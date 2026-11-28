@@ -1,6 +1,6 @@
 [package]
 name = "cpufish-aocl"
-version = "0.0.35"
+version = "0.0.36"
 edition = "2024"
 rust-version = "1.95"
 description = "AMD AOCL (BLIS) provider for CPUFish"
@@ -12,7 +12,7 @@ categories = ["mathematics", "science"]
 publish = false
 
 [dependencies]
-cpufish = { path = "../..", version = "0.0.35" }
+cpufish = { path = "../..", version = "0.0.36" }
 aocl-blas = "0.5"
 aocl-blas-sys = "0.5"
 aocl-types = "0.5"

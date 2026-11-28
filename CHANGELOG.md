@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.36 - 2026-11-28 (PM-allocated; non-breaking: `cpufish-aocl` takes aocl-blas, aocl-blas-sys and aocl-types 0.2 -> 0.5 (locks 0.5.1); written by pm-assist from the diff)
+
+- `crates/cpufish-aocl/Cargo.toml`: `aocl-blas`, `aocl-blas-sys`, `aocl-types` `0.2` -> `0.5` (aocl 0.5.1 is on crates.io; the 0.5 line carries the safe-API length-validation fixes). Not breaking: no `pub` item of cpufish names an aocl type (git grep of `crates/*/src` for pub items naming `aocl_`: 0 hits; the 8 uses in `cpufish-aocl/src/lib.rs` are internal). The lane's check results: see the PR; cpufish stays unpublished (a placeholder on crates.io).
+
 ## 0.0.35 - 2026-11-27 (PM-allocated; non-breaking: lock-only move of onemkl and onemkl-sys 0.6.7 to 0.6.8; written by pm-assist from the diff)
 
 - `Cargo.lock` only: `onemkl` and `onemkl-sys` 0.6.7 -> 0.6.8 (both on crates.io; the 0.6.8 release fixes the `InterpolateEx1D` search call-back negative-status read; cpufish has 0 `InterpolateEx1D` references (the lane's grep at origin/main c6e1971), so it is not affected either way). `cargo check -p cpufish-onemkl --locked` ok. cpufish stays unpublished (a placeholder on crates.io).

@@ -19,4 +19,4 @@ threading-intel-openmp = ["onemkl/threading-intel-openmp"]
 
 [dependencies]
 cpufish = { path = "../..", version = "0.0.35" }
-onemkl = { version = "0.6", default-features = false, features = ["lp64", "link-dynamic", "blas"] }
+onemkl = { version = "0.7", default-features = false, features = ["lp64", "link-dynamic", "blas"] }

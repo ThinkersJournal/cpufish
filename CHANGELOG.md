@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.0.33 - 2026-11-27 (PM-allocated; non-breaking: lock-only move of onemkl and onemkl-sys 0.6.1 to 0.6.5)
 
 - Lock moves `onemkl` and `onemkl-sys` 0.6.1 to 0.6.5 (the PM's ILP64 bundle; `Cargo.toml` still says `0.6`; this repo does not enable `ilp64`, a library crate must not). Produced with `cargo update -p onemkl --precise 0.6.5` then `cargo update -p bindgen --precise 0.73.2` (the first alone leaves bindgen on syn 2 beside prettyplease 0.3 on syn 3; the second puts it back on syn 3). `cargo test --workspace --locked` passes on Windows (oneAPI 2026.1).
 

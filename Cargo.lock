@@ -63,9 +63,9 @@ dependencies = [
 
 [[package]]
 name = "aocl-blas"
-version = "0.2.5"
+version = "0.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8c42735a7dcc9db2c8d0261cc6ab6ad853fcb3a90b0e44790437a1eef8a8824f"
+checksum = "ca2fb7645942617eddc207c5acb3cb7517a8b37c80162012df0e35bcc929725f"
 dependencies = [
  "aocl-blas-sys",
  "aocl-error",
@@ -74,37 +74,36 @@ dependencies = [
 
 [[package]]
 name = "aocl-blas-sys"
-version = "0.2.5"
+version = "0.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "520159022daee9da36b646b3b0c2aa3a922b8989a900cc9f18a71f8ae5358030"
+checksum = "09293bbf1c304db89731483ed950a6f36c7fdeeadd8bf451b41d4a2bbba2089d"
 dependencies = [
  "aocl-build",
- "libc",
 ]
 
 [[package]]
 name = "aocl-build"
-version = "0.2.5"
+version = "0.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1f295ec75752495c82413c5291ae3f26ac918f4c776220beabc60b82f60100dd"
+checksum = "c2a542aeb8486a53f78961bad2ce89157df92d483ef4c97a84b419dd96b8f409"
 dependencies = [
  "bindgen",
 ]
 
 [[package]]
 name = "aocl-error"
-version = "0.2.5"
+version = "0.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "682dd03badc07d6382181ccd1e9b182358d2f5c66e95432afdccf91f73c702c1"
+checksum = "47ae605ba6c80c6d29c6c502e080fc9c907f8fa04d85998859b8ea899176525f"
 dependencies = [
  "thiserror 2.0.21",
 ]
 
 [[package]]
 name = "aocl-types"
-version = "0.2.5"
+version = "0.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "77a1bb97205cd1447c07ada0b62780d1118c26f75a8278920dc4ec85cb6af1c2"
+checksum = "ce3cfe5b6dcaedafc18e6f56df9115a24c6529613d8228a1bfb5644f97535d1a"
 
 [[package]]
 name = "autocfg"
